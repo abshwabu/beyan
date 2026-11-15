@@ -21,8 +21,8 @@ class ResolveTenantInstitution
         $user = $request->user();
 
         if ($user) {
-            // Platform Super Admin operates outside any institution
-            if (empty($user->institution_id) && $user->isPlatformSuperAdmin()) {
+            // Platform Staff (Super Admin or Support) operates outside any institution
+            if (empty($user->institution_id) && $user->isPlatformStaff()) {
                 $this->tenantManager->clear();
                 app(PermissionRegistrar::class)->setPermissionsTeamId(null);
                 $request->attributes->set('is_platform_admin', true);
@@ -36,7 +36,7 @@ class ResolveTenantInstitution
                 abort(403, 'User does not belong to any institution.');
             }
 
-            if ($institution->status === 'suspended') {
+            if ($institution->status === 'suspended' || $institution->fresh()?->status === 'suspended') {
                 abort(403, 'Institution subscription is suspended. Please contact support.');
             }
 

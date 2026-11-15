@@ -1,7 +1,8 @@
 <?php
 
-use App\Domain\Auth\Http\Middleware\EnsurePlatformSuperAdmin;
 use App\Domain\Institution\Tenancy\ResolveTenantInstitution;
+use App\Domain\Platform\Http\Middleware\EnsurePlatformAdmin;
+use App\Domain\Platform\Http\Middleware\EnsurePlatformSuperAdminOnly;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
@@ -18,7 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'tenant' => ResolveTenantInstitution::class,
-            'platform.admin' => EnsurePlatformSuperAdmin::class,
+            'platform.admin' => EnsurePlatformAdmin::class,
+            'platform.super' => EnsurePlatformSuperAdminOnly::class,
         ]);
         $middleware->web(append: [
             SetLocale::class,

@@ -2,6 +2,7 @@
 
 namespace App\Domain\Students\Http\Controllers;
 
+use App\Domain\Platform\Services\PlanLimitService;
 use App\Domain\Students\Actions\RegisterStudentAction;
 use App\Domain\Students\Models\Student;
 use App\Domain\Students\Models\StudentDocument;
@@ -59,6 +60,11 @@ class StudentController extends Controller
     public function store(Request $request): JsonResponse|RedirectResponse
     {
         Gate::authorize('create', Student::class);
+
+        // Check subscription plan student limits
+        if ($institution = $request->user()?->institution) {
+            app(PlanLimitService::class)->ensureCanAddStudent($institution);
+        }
 
         $validated = $request->validate([
             'full_name' => ['required_without:name', 'nullable', 'string', 'max:255'],

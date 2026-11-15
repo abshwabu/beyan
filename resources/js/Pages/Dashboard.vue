@@ -25,6 +25,28 @@ const formatCurrency = (minorUnits) => {
 
 <template>
   <div class="min-h-screen bg-slate-100" :dir="isRtl ? 'rtl' : 'ltr'">
+    <!-- Impersonation Banner -->
+    <div v-if="$page.props.impersonation?.active" class="bg-amber-400 text-slate-900 px-4 py-2.5 font-bold text-xs sm:text-sm shadow-md flex flex-wrap items-center justify-between gap-2 border-b border-amber-500">
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 bg-slate-900 text-white rounded text-[11px] uppercase tracking-wider font-extrabold">Support Session</span>
+        <span>You are viewing <strong>{{ $page.props.impersonation.institution_name }}</strong>. Reason: <em>"{{ $page.props.impersonation.reason }}"</em>. (Auto-expires in ~{{ $page.props.impersonation.minutes_remaining }} min)</span>
+      </div>
+      <Link href="/platform/impersonate/stop" method="post" as="button" class="px-3 py-1 bg-slate-900 text-white rounded-md text-xs hover:bg-slate-800 font-bold transition">
+        Leave Support Impersonation &rarr;
+      </Link>
+    </div>
+
+    <!-- Platform Announcement Banner -->
+    <div v-if="$page.props.announcement" class="bg-indigo-700 text-white px-4 py-2 text-xs sm:text-sm shadow-sm flex items-center justify-between gap-4 border-b border-indigo-800">
+      <div class="flex items-center gap-2 truncate">
+        <span class="font-extrabold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded text-[10px]">Announcement</span>
+        <span class="truncate"><strong>{{ $page.props.announcement.title }}:</strong> {{ $page.props.announcement.body }}</span>
+      </div>
+      <Link :href="`/announcements/${$page.props.announcement.id}/dismiss`" method="post" as="button" class="text-white/80 hover:text-white font-black text-sm ms-2 flex-shrink-0" title="Dismiss announcement">
+        ✕
+      </Link>
+    </div>
+
     <!-- Top Navigation Header -->
     <nav class="bg-white border-b border-slate-200 sticky top-0 z-40">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

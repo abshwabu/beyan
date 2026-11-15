@@ -63,6 +63,25 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if user is Platform Support staff.
+     */
+    public function isPlatformSupport(): bool
+    {
+        return empty($this->institution_id) && (
+            $this->role === 'platform_support' ||
+            $this->hasRole('Platform Support')
+        );
+    }
+
+    /**
+     * Check if user is any Platform Staff member.
+     */
+    public function isPlatformStaff(): bool
+    {
+        return $this->isPlatformSuperAdmin() || $this->isPlatformSupport();
+    }
+
+    /**
      * Check if user is Owner of their institution.
      */
     public function isOwner(): bool

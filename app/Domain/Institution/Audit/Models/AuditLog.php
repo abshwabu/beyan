@@ -50,4 +50,12 @@ class AuditLog extends Model
     {
         return $this->morphTo();
     }
+
+    /**
+     * Alias event attribute to action.
+     */
+    public function getEventAttribute(): ?string
+    {
+        return $this->action;
+    }
 }

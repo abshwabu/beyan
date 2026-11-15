@@ -136,7 +136,7 @@ class BackupAndRestoreTest extends TestCase
 
         // 3. Mutate the active database (simulate data loss / corruption)
         $tenantManager->withoutTenantScope(function () use ($institution) {
-            $institution->delete();
+            $institution->forceDelete();
         });
 
         $this->assertDatabaseMissing('institutions', ['slug' => 'original-madrasa']);

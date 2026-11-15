@@ -19,6 +19,7 @@ class Plan extends Model
         'yearly_price',
         'currency',
         'student_limit',
+        'user_limit',
         'features',
         'badge',
         'is_active',
@@ -33,6 +34,7 @@ class Plan extends Model
             'monthly_price' => 'integer',
             'yearly_price' => 'integer',
             'student_limit' => 'integer',
+            'user_limit' => 'integer',
             'sort_order' => 'integer',
         ];
     }

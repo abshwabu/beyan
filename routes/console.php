@@ -12,3 +12,8 @@ Schedule::command('backup:sqlite --keep-days=14')
     ->at('02:00')
     ->withoutOverlapping()
     ->appendOutputTo(storage_path('logs/backup.log'));
+
+Schedule::command('platform:subscriptions:check-expiry')
+    ->daily()
+    ->at('03:00')
+    ->withoutOverlapping();

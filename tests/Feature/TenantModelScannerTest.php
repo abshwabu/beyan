@@ -40,6 +40,11 @@ class TenantModelScannerTest extends TestCase
         'quran_juzs',
         'plans',
         'demo_requests',
+        'subscriptions',
+        'platform_payments',
+        'platform_announcements',
+        'platform_announcement_dismissals',
+        'platform_settings',
     ];
 
     public function test_all_models_with_institution_id_use_belongs_to_institution_trait(): void
@@ -63,6 +68,11 @@ class TenantModelScannerTest extends TestCase
             /** @var Model $instance */
             $instance = new $class;
             $table = $instance->getTable();
+
+            // Skip platform and global tables
+            if (in_array($table, $this->globalTables, true)) {
+                continue;
+            }
 
             // Check if this model's table has an institution_id column
             if (Schema::hasColumn($table, 'institution_id')) {

@@ -20,6 +20,7 @@ class DemoRequest extends Model
         'mode',
         'student_count_range',
         'message',
+        'notes',
         'status',
         'ip_address',
         'user_agent',

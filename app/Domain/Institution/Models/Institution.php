@@ -6,17 +6,21 @@ use App\Domain\Academics\Models\AcademicYear;
 use App\Domain\Academics\Models\Term;
 use App\Domain\Auth\Models\User;
 use App\Domain\Institution\Audit\Auditable;
+use App\Domain\Platform\Models\PlatformPayment;
+use App\Domain\Platform\Models\Subscription;
 use Carbon\CarbonInterface;
 use Database\Factories\InstitutionFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 class Institution extends Model
 {
-    use Auditable, HasFactory, HasUlids;
+    use Auditable, HasFactory, HasUlids, SoftDeletes;
 
     protected $table = 'institutions';
 
@@ -29,6 +33,7 @@ class Institution extends Model
         'timezone',
         'currency',
         'locale',
+        'country',
         'status',
         'subscription_plan',
         'subscription_ends_at',
@@ -53,6 +58,21 @@ class Institution extends Model
     public function users(): HasMany
     {
         return $this->hasMany(User::class, 'institution_id');
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class, 'institution_id');
+    }
+
+    public function latestSubscription(): HasOne
+    {
+        return $this->hasOne(Subscription::class, 'institution_id')->latestOfMany();
+    }
+
+    public function platformPayments(): HasMany
+    {
+        return $this->hasMany(PlatformPayment::class, 'institution_id');
     }
 
     public function academicYears(): HasMany

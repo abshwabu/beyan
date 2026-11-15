@@ -11,7 +11,18 @@ use App\Domain\Hifz\Http\Controllers\HifzController;
 use App\Domain\Institution\Http\Controllers\DashboardController;
 use App\Domain\Institution\Http\Controllers\InstitutionRegistrationController;
 use App\Domain\Institution\Http\Controllers\LandingPageController;
-use App\Domain\Institution\Http\Controllers\PlatformInstitutionController;
+use App\Domain\Platform\Http\Controllers\PlatformAnnouncementController;
+use App\Domain\Platform\Http\Controllers\PlatformAuditLogController;
+use App\Domain\Platform\Http\Controllers\PlatformDemoRequestController;
+use App\Domain\Platform\Http\Controllers\PlatformImpersonationController;
+use App\Domain\Platform\Http\Controllers\PlatformInstitutionController;
+use App\Domain\Platform\Http\Controllers\PlatformOverviewController;
+use App\Domain\Platform\Http\Controllers\PlatformPaymentController;
+use App\Domain\Platform\Http\Controllers\PlatformPlanController;
+use App\Domain\Platform\Http\Controllers\PlatformSettingsController;
+use App\Domain\Platform\Http\Controllers\PlatformStaffController;
+use App\Domain\Platform\Http\Controllers\PlatformSubscriptionController;
+use App\Domain\Platform\Http\Controllers\PlatformSystemHealthController;
 use App\Domain\Reports\Http\Controllers\ReportController;
 use App\Domain\Students\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Auth;
@@ -48,17 +59,83 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
 
-// Platform Super Admin Routes (Outside any institution)
+// Impersonation Stop Route (Authenticated tenant user returning to platform admin)
+Route::post('/platform/impersonate/stop', [PlatformImpersonationController::class, 'stop'])
+    ->middleware('auth')
+    ->name('platform.impersonate.stop');
+
+// Platform Super Admin & Staff Routes (Outside any institution)
 Route::middleware(['auth', 'platform.admin'])->prefix('platform')->name('platform.')->group(function () {
+    // 1. Overview Dashboard
+    Route::get('/', [PlatformOverviewController::class, 'index'])->name('overview');
+    Route::get('/dashboard', [PlatformOverviewController::class, 'index'])->name('dashboard');
+
+    // 2. Institutions Management
     Route::get('/institutions', [PlatformInstitutionController::class, 'index'])->name('institutions.index');
+    Route::get('/institutions/create', [PlatformInstitutionController::class, 'create'])->name('institutions.create');
+    Route::post('/institutions', [PlatformInstitutionController::class, 'store'])->name('institutions.store');
+    Route::get('/institutions/{id}', [PlatformInstitutionController::class, 'show'])->name('institutions.show');
+    Route::get('/institutions/{id}/edit', [PlatformInstitutionController::class, 'edit'])->name('institutions.edit');
+    Route::put('/institutions/{id}', [PlatformInstitutionController::class, 'update'])->name('institutions.update');
+    Route::delete('/institutions/{id}', [PlatformInstitutionController::class, 'destroy'])->name('institutions.destroy');
     Route::post('/institutions/{id}/suspend', [PlatformInstitutionController::class, 'suspend'])->name('institutions.suspend');
     Route::post('/institutions/{id}/activate', [PlatformInstitutionController::class, 'activate'])->name('institutions.activate');
+    Route::post('/institutions/{id}/extend-trial', [PlatformInstitutionController::class, 'extendTrial'])->name('institutions.extend-trial');
     Route::put('/institutions/{id}/plan', [PlatformInstitutionController::class, 'updatePlan'])->name('institutions.plan');
+
+    // Impersonate owner (Super Admin only)
+    Route::post('/institutions/{id}/impersonate', [PlatformImpersonationController::class, 'start'])
+        ->middleware('platform.super')
+        ->name('institutions.impersonate');
+
+    // 3. Plans CRUD
+    Route::resource('plans', PlatformPlanController::class);
+
+    // Subscriptions
+    Route::get('/subscriptions', [PlatformSubscriptionController::class, 'index'])->name('subscriptions.index');
+    Route::post('/subscriptions/{id}/extend', [PlatformSubscriptionController::class, 'extend'])->name('subscriptions.extend');
+
+    // 4. Manual Subscription Payments
+    Route::get('/payments', [PlatformPaymentController::class, 'index'])->name('payments.index');
+    Route::post('/payments', [PlatformPaymentController::class, 'store'])->name('payments.store');
+    Route::post('/payments/{id}/reverse', [PlatformPaymentController::class, 'reverse'])->name('payments.reverse');
+    Route::get('/payments/{id}/receipt', [PlatformPaymentController::class, 'receipt'])->name('payments.receipt');
+    Route::get('/payments/export', [PlatformPaymentController::class, 'export'])->name('payments.export');
+
+    // 5. Demo Requests
+    Route::get('/demo-requests', [PlatformDemoRequestController::class, 'index'])->name('demo-requests.index');
+    Route::put('/demo-requests/{id}', [PlatformDemoRequestController::class, 'updateStatus'])->name('demo-requests.update');
+    Route::get('/demo-requests/{id}/convert', [PlatformDemoRequestController::class, 'convert'])->name('demo-requests.convert');
+
+    // 6. Platform Announcements
+    Route::get('/announcements', [PlatformAnnouncementController::class, 'index'])->name('announcements.index');
+    Route::post('/announcements', [PlatformAnnouncementController::class, 'store'])->name('announcements.store');
+    Route::put('/announcements/{id}', [PlatformAnnouncementController::class, 'update'])->name('announcements.update');
+    Route::delete('/announcements/{id}', [PlatformAnnouncementController::class, 'destroy'])->name('announcements.destroy');
+
+    // 7. System Health & Settings
+    Route::get('/health', [PlatformSystemHealthController::class, 'index'])->name('health.index');
+    Route::post('/health/backup', [PlatformSystemHealthController::class, 'triggerBackup'])->name('health.backup');
+    Route::get('/settings', [PlatformSettingsController::class, 'index'])->name('settings.index');
+    Route::put('/settings', [PlatformSettingsController::class, 'update'])->name('settings.update');
+
+    // 8. Platform Staff Management (Super Admin only)
+    Route::get('/staff', [PlatformStaffController::class, 'index'])->name('staff.index');
+    Route::post('/staff', [PlatformStaffController::class, 'store'])->middleware('platform.super')->name('staff.store');
+    Route::put('/staff/{id}', [PlatformStaffController::class, 'update'])->middleware('platform.super')->name('staff.update');
+    Route::delete('/staff/{id}', [PlatformStaffController::class, 'destroy'])->middleware('platform.super')->name('staff.destroy');
+
+    // Platform Audit Logs
+    Route::get('/audit-logs', [PlatformAuditLogController::class, 'index'])->name('audit-logs.index');
+    Route::get('/audit-logs/export', [PlatformAuditLogController::class, 'export'])->name('audit-logs.export');
 });
 
 // Tenant Workspace Routes (Protected by auth and tenant middleware)
 Route::middleware(['auth', 'tenant'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+
+    // Platform Announcement Dismissal
+    Route::post('/announcements/{id}/dismiss', [PlatformAnnouncementController::class, 'dismiss'])->name('announcements.dismiss');
 
     // User Invitations
     Route::post('/invitations', [UserInvitationController::class, 'store'])->name('invitations.store');
