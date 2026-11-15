@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\Academics\Http\Controllers\AcademicYearController;
+use App\Domain\Academics\Http\Controllers\TeacherTimetableController;
 use App\Domain\Attendance\Http\Controllers\AttendanceController;
 use App\Domain\Auth\Http\Controllers\AuthenticatedSessionController;
 use App\Domain\Auth\Http\Controllers\PasswordResetController;
@@ -88,6 +89,9 @@ Route::middleware(['auth', 'tenant'])->group(function () {
         Route::get('/{id}/documents/{documentId}/download', [StudentController::class, 'downloadDocument'])->name('documents.download');
         Route::delete('/{id}/documents/{documentId}', [StudentController::class, 'deleteDocument'])->name('documents.delete');
     });
+
+    // Timetable
+    Route::get('/timetable/today', [TeacherTimetableController::class, 'today'])->name('timetable.today');
 
     // Attendance
     Route::prefix('attendance')->name('attendance.')->group(function () {

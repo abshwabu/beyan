@@ -8,6 +8,7 @@ use App\Domain\Auth\Models\User;
 use App\Domain\Auth\Services\RolePermissionMatrix;
 use App\Domain\Institution\Models\Institution;
 use App\Domain\Institution\Tenancy\TenantManager;
+use App\Domain\Teachers\Models\Teacher;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
@@ -108,6 +109,25 @@ class DemoInstitutionsSeeder extends Seeder
             ]
         );
         $teacher->assignRole('Teacher');
+
+        // Teacher Profile
+        Teacher::withoutInstitutionScope()->updateOrCreate(
+            [
+                'institution_id' => $institution->id,
+                'user_id' => $teacher->id,
+            ],
+            [
+                'full_name' => $teacher->name,
+                'email' => $teacher->email,
+                'phone' => $teacher->phone,
+                'specialization' => 'Hifz & Tajweed',
+                'qualifications' => ['Ijazah in Hafs an Asim', '10 Years Madrasa Teaching'],
+                'status' => 'active',
+            ]
+        );
+
+        // Core Courses
+        (new DefaultCoursesSeeder)->run($institution->id);
 
         // Academic Year
         $academicYear = AcademicYear::withoutInstitutionScope()->updateOrCreate(
@@ -218,6 +238,25 @@ class DemoInstitutionsSeeder extends Seeder
             ]
         );
         $teacher->assignRole('Teacher');
+
+        // Teacher Profile
+        Teacher::withoutInstitutionScope()->updateOrCreate(
+            [
+                'institution_id' => $institution->id,
+                'user_id' => $teacher->id,
+            ],
+            [
+                'full_name' => $teacher->name,
+                'email' => $teacher->email,
+                'phone' => $teacher->phone,
+                'specialization' => 'Hifz & Tajweed',
+                'qualifications' => ['Ijazah in Hafs an Asim', '10 Years Madrasa Teaching'],
+                'status' => 'active',
+            ]
+        );
+
+        // Core Courses
+        (new DefaultCoursesSeeder)->run($institution->id);
 
         // Academic Year
         $academicYear = AcademicYear::withoutInstitutionScope()->updateOrCreate(
