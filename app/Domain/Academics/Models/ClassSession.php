@@ -2,6 +2,7 @@
 
 namespace App\Domain\Academics\Models;
 
+use App\Domain\Attendance\Models\AttendanceRecord;
 use App\Domain\Institution\Audit\Auditable;
 use App\Domain\Institution\Tenancy\BelongsToInstitution;
 use App\Domain\Teachers\Models\Teacher;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ClassSession extends Model
 {
@@ -58,6 +60,11 @@ class ClassSession extends Model
     public function teacher(): BelongsTo
     {
         return $this->belongsTo(Teacher::class, 'teacher_id');
+    }
+
+    public function attendanceRecords(): HasMany
+    {
+        return $this->hasMany(AttendanceRecord::class, 'class_session_id');
     }
 
     /**

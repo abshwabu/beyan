@@ -11,6 +11,7 @@ use App\Domain\Hifz\Http\Controllers\HifzController;
 use App\Domain\Institution\Http\Controllers\DashboardController;
 use App\Domain\Institution\Http\Controllers\InstitutionRegistrationController;
 use App\Domain\Institution\Http\Controllers\PlatformInstitutionController;
+use App\Domain\Reports\Http\Controllers\ReportController;
 use App\Domain\Students\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -135,5 +136,12 @@ Route::middleware(['auth', 'tenant'])->group(function () {
         Route::post('/students/{student}/targets', [HifzController::class, 'storeTarget'])->name('student.targets.store');
         Route::post('/students/{student}/certifications', [HifzController::class, 'storeCertification'])->name('student.certifications.store');
         Route::get('/students/{student}/compare', [HifzController::class, 'compareProgress'])->name('student.compare');
+    });
+
+    // Reports
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [ReportController::class, 'index'])->name('index');
+        Route::get('/{type}', [ReportController::class, 'show'])->name('show');
+        Route::get('/{type}/export', [ReportController::class, 'export'])->name('export');
     });
 });
