@@ -6,6 +6,8 @@ use App\Domain\Attendance\Models\AttendanceRecord;
 use App\Domain\Attendance\Policies\AttendancePolicy;
 use App\Domain\Finance\Models\FeeInvoice;
 use App\Domain\Finance\Policies\FinancePolicy;
+use App\Domain\Hifz\Models\HifzEntry;
+use App\Domain\Hifz\Policies\HifzPolicy;
 use App\Domain\Institution\Tenancy\TenantManager;
 use App\Domain\Students\Models\Student;
 use App\Domain\Students\Policies\StudentPolicy;
@@ -53,6 +55,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(
             FeeInvoice::class,
             FinancePolicy::class
+        );
+
+        Gate::policy(
+            HifzEntry::class,
+            HifzPolicy::class
         );
 
         Gate::before(function ($user, $ability) {

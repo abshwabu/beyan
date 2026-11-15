@@ -5,9 +5,11 @@ namespace App\Domain\Auth\Models;
 use App\Domain\Institution\Audit\Auditable;
 use App\Domain\Institution\Tenancy\BelongsToInstitution;
 use App\Domain\Students\Models\Student;
+use App\Domain\Teachers\Models\Teacher;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -74,6 +76,11 @@ class User extends Authenticatable
     public function isTeacher(): bool
     {
         return $this->hasRole('Teacher') || $this->role === 'teacher';
+    }
+
+    public function teacherProfile(): HasOne
+    {
+        return $this->hasOne(Teacher::class, 'user_id');
     }
 
     /**

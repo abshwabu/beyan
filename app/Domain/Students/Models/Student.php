@@ -5,6 +5,9 @@ namespace App\Domain\Students\Models;
 use App\Domain\Attendance\Models\AttendanceRecord;
 use App\Domain\Auth\Models\User;
 use App\Domain\Finance\Models\FeeInvoice;
+use App\Domain\Hifz\Models\HifzCertification;
+use App\Domain\Hifz\Models\HifzEntry;
+use App\Domain\Hifz\Models\HifzTarget;
 use App\Domain\Institution\Audit\Auditable;
 use App\Domain\Institution\Models\Institution;
 use App\Domain\Institution\Tenancy\BelongsToInstitution;
@@ -148,6 +151,21 @@ class Student extends Model
     public function attendanceRecords(): HasMany
     {
         return $this->hasMany(AttendanceRecord::class, 'student_id');
+    }
+
+    public function hifzEntries(): HasMany
+    {
+        return $this->hasMany(HifzEntry::class, 'student_id');
+    }
+
+    public function hifzTargets(): HasMany
+    {
+        return $this->hasMany(HifzTarget::class, 'student_id');
+    }
+
+    public function hifzCertifications(): HasMany
+    {
+        return $this->hasMany(HifzCertification::class, 'student_id');
     }
 
     public function feeInvoices(): HasMany

@@ -1,0 +1,193 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Domain\Hifz\Models\QuranJuz;
+use App\Domain\Hifz\Models\QuranSurah;
+use Illuminate\Database\Seeder;
+
+class QuranReferenceSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $surahs = [
+            [1, 'الفاتحة', 'The Opening', 'Al-Fatihah', 7, 'Meccan'],
+            [2, 'البقرة', 'The Cow', 'Al-Baqarah', 286, 'Medinan'],
+            [3, 'آل عمران', 'Family of Imran', 'Ali Imran', 200, 'Medinan'],
+            [4, 'النساء', 'The Women', 'An-Nisa', 176, 'Medinan'],
+            [5, 'المائدة', 'The Table Spread', 'Al-Ma\'idah', 120, 'Medinan'],
+            [6, 'الأنعام', 'The Cattle', 'Al-An\'am', 165, 'Meccan'],
+            [7, 'الأعراف', 'The Heights', 'Al-A\'raf', 206, 'Meccan'],
+            [8, 'الأنفال', 'The Spoils of War', 'Al-Anfal', 75, 'Medinan'],
+            [9, 'التوبة', 'The Repentance', 'At-Tawbah', 129, 'Medinan'],
+            [10, 'يونس', 'Jonah', 'Yunus', 109, 'Meccan'],
+            [11, 'هود', 'Hud', 'Hud', 123, 'Meccan'],
+            [12, 'يوسف', 'Joseph', 'Yusuf', 111, 'Meccan'],
+            [13, 'الرعد', 'The Thunder', 'Ar-Ra\'d', 43, 'Medinan'],
+            [14, 'إبراهيم', 'Abraham', 'Ibrahim', 52, 'Meccan'],
+            [15, 'الحجر', 'The Rocky Tract', 'Al-Hijr', 99, 'Meccan'],
+            [16, 'النحل', 'The Bee', 'An-Nahl', 128, 'Meccan'],
+            [17, 'الإسراء', 'The Night Journey', 'Al-Isra', 111, 'Meccan'],
+            [18, 'الكهف', 'The Cave', 'Al-Kahf', 110, 'Meccan'],
+            [19, 'مريم', 'Mary', 'Maryam', 98, 'Meccan'],
+            [20, 'طه', 'Ta-Ha', 'Ta-Ha', 135, 'Meccan'],
+            [21, 'الأنبياء', 'The Prophets', 'Al-Anbiya', 112, 'Meccan'],
+            [22, 'الحج', 'The Pilgrimage', 'Al-Hajj', 78, 'Medinan'],
+            [23, 'المؤمنون', 'The Believers', 'Al-Mu\'minun', 118, 'Meccan'],
+            [24, 'النور', 'The Light', 'An-Nur', 64, 'Medinan'],
+            [25, 'الفرقان', 'The Criterion', 'Al-Furqan', 77, 'Meccan'],
+            [26, 'الشعراء', 'The Poets', 'Ash-Shu\'ara', 227, 'Meccan'],
+            [27, 'النمل', 'The Ant', 'An-Naml', 93, 'Meccan'],
+            [28, 'القصص', 'The Stories', 'Al-Qasas', 88, 'Meccan'],
+            [29, 'العنكبوت', 'The Spider', 'Al-Ankabut', 69, 'Meccan'],
+            [30, 'الروم', 'The Romans', 'Ar-Rum', 60, 'Meccan'],
+            [31, 'لقمان', 'Luqman', 'Luqman', 34, 'Meccan'],
+            [32, 'السجدة', 'The Prostration', 'As-Sajdah', 30, 'Meccan'],
+            [33, 'الأحزاب', 'The Combined Forces', 'Al-Ahzab', 73, 'Medinan'],
+            [34, 'سبأ', 'Sheba', 'Saba', 54, 'Meccan'],
+            [35, 'فاطر', 'Originator', 'Fatir', 45, 'Meccan'],
+            [36, 'يس', 'Ya-Sin', 'Ya-Sin', 83, 'Meccan'],
+            [37, 'الصافات', 'Those who set the Ranks', 'As-Saffat', 182, 'Meccan'],
+            [38, 'ص', 'The Letter Sad', 'Sad', 88, 'Meccan'],
+            [39, 'الزمر', 'The Troops', 'Az-Zumar', 75, 'Meccan'],
+            [40, 'غافر', 'The Forgiver', 'Ghafir', 85, 'Meccan'],
+            [41, 'فصلت', 'Explained in Detail', 'Fussilat', 54, 'Meccan'],
+            [42, 'الشورى', 'The Consultation', 'Ash-Shura', 53, 'Meccan'],
+            [43, 'الزخرف', 'The Ornaments of Gold', 'Az-Zukhruf', 89, 'Meccan'],
+            [44, 'الدخان', 'The Smoke', 'Ad-Dukhan', 59, 'Meccan'],
+            [45, 'الجاثية', 'The Crouching', 'Al-Jathiyah', 37, 'Meccan'],
+            [46, 'الأحقاف', 'The Wind-Curved Sandhills', 'Al-Ahqaf', 35, 'Meccan'],
+            [47, 'محمد', 'Muhammad', 'Muhammad', 38, 'Medinan'],
+            [48, 'الفتح', 'The Victory', 'Al-Fath', 29, 'Medinan'],
+            [49, 'الحجرات', 'The Rooms', 'Al-Hujurat', 18, 'Medinan'],
+            [50, 'ق', 'The Letter Qaf', 'Qaf', 45, 'Meccan'],
+            [51, 'الذاريات', 'The Winnowing Winds', 'Adh-Dhariyat', 60, 'Meccan'],
+            [52, 'الطور', 'The Mount', 'At-Tur', 49, 'Meccan'],
+            [53, 'النجم', 'The Star', 'An-Najm', 62, 'Meccan'],
+            [54, 'القمر', 'The Moon', 'Al-Qamar', 55, 'Meccan'],
+            [55, 'الرحمن', 'The Beneficent', 'Ar-Rahman', 78, 'Medinan'],
+            [56, 'الواقعة', 'The Inevitable', 'Al-Waqi\'ah', 96, 'Meccan'],
+            [57, 'الحديد', 'The Iron', 'Al-Hadid', 29, 'Medinan'],
+            [58, 'المجادلة', 'The Pleading Woman', 'Al-Mujadila', 22, 'Medinan'],
+            [59, 'الحشر', 'The Exile', 'Al-Hashr', 24, 'Medinan'],
+            [60, 'الممتحنة', 'She that is to be examined', 'Al-Mumtahanah', 13, 'Medinan'],
+            [61, 'الصف', 'The Ranks', 'As-Saff', 14, 'Medinan'],
+            [62, 'الجمعة', 'The Congregation', 'Al-Jumu\'ah', 11, 'Medinan'],
+            [63, 'المنافقون', 'The Hypocrites', 'Al-Munafiqun', 11, 'Medinan'],
+            [64, 'التغابن', 'The Mutual Disillusion', 'At-Taghabun', 18, 'Medinan'],
+            [65, 'الطلاق', 'The Divorce', 'At-Talaq', 12, 'Medinan'],
+            [66, 'التحريم', 'The Prohibition', 'At-Tahrim', 12, 'Medinan'],
+            [67, 'الملك', 'The Sovereignty', 'Al-Mulk', 30, 'Meccan'],
+            [68, 'القلم', 'The Pen', 'Al-Qalam', 52, 'Meccan'],
+            [69, 'الحاقة', 'The Reality', 'Al-Haqqah', 52, 'Meccan'],
+            [70, 'المعارج', 'The Ascending Stairways', 'Al-Ma\'arij', 44, 'Meccan'],
+            [71, 'نوح', 'Noah', 'Nuh', 28, 'Meccan'],
+            [72, 'الجن', 'The Jinn', 'Al-Jinn', 28, 'Meccan'],
+            [73, 'المزمل', 'The Enshrouded One', 'Al-Muzzammil', 20, 'Meccan'],
+            [74, 'المدثر', 'The Cloaked One', 'Al-Muddaththir', 56, 'Meccan'],
+            [75, 'القيامة', 'The Resurrection', 'Al-Qiyamah', 40, 'Meccan'],
+            [76, 'الإنسان', 'The Man', 'Al-Insan', 31, 'Medinan'],
+            [77, 'المرسلات', 'The Emissaries', 'Al-Mursalat', 50, 'Meccan'],
+            [78, 'النبأ', 'The Tidings', 'An-Naba', 40, 'Meccan'],
+            [79, 'النازعات', 'Those who drag forth', 'An-Nazi\'at', 46, 'Meccan'],
+            [80, 'عبس', 'He Frowned', 'Abasa', 42, 'Meccan'],
+            [81, 'التكوير', 'The Overthrowing', 'At-Takwir', 29, 'Meccan'],
+            [82, 'الانفطار', 'The Cleaving', 'Al-Infitar', 19, 'Meccan'],
+            [83, 'المطففين', 'The Defrauding', 'Al-Mutaffifin', 36, 'Meccan'],
+            [84, 'الانشقاق', 'The Splitting Open', 'Al-Inshiqaq', 25, 'Meccan'],
+            [85, 'البروج', 'The Mansions of the Stars', 'Al-Buruj', 22, 'Meccan'],
+            [86, 'الطارق', 'The Morning Star', 'At-Tariq', 17, 'Meccan'],
+            [87, 'الأعلى', 'The Most High', 'Al-A\'la', 19, 'Meccan'],
+            [88, 'الغاشية', 'The Overwhelming', 'Al-Ghashiyah', 26, 'Meccan'],
+            [89, 'الفجر', 'The Dawn', 'Al-Fajr', 30, 'Meccan'],
+            [90, 'البلد', 'The City', 'Al-Balad', 20, 'Meccan'],
+            [91, 'الشمس', 'The Sun', 'Ash-Shams', 15, 'Meccan'],
+            [92, 'الليل', 'The Night', 'Al-Layl', 21, 'Meccan'],
+            [93, 'الضحى', 'The Morning Hours', 'Ad-Duha', 11, 'Meccan'],
+            [94, 'الشرح', 'The Relief', 'Ash-Sharh', 8, 'Meccan'],
+            [95, 'التين', 'The Fig', 'At-Tin', 8, 'Meccan'],
+            [96, 'العلق', 'The Clot', 'Al-Alaq', 19, 'Meccan'],
+            [97, 'القدر', 'The Power', 'Al-Qadr', 5, 'Meccan'],
+            [98, 'البينة', 'The Clear Proof', 'Al-Bayyinah', 8, 'Medinan'],
+            [99, 'الزلزلة', 'The Earthquake', 'Az-Zalzalah', 8, 'Medinan'],
+            [100, 'العاديات', 'The Courser', 'Al-Adiyat', 11, 'Meccan'],
+            [101, 'القارعة', 'The Calamity', 'Al-Qari\'ah', 11, 'Meccan'],
+            [102, 'التكاثر', 'The Rivalry in world increase', 'At-Takathur', 8, 'Meccan'],
+            [103, 'العصر', 'The Declining Day', 'Al-Asr', 3, 'Meccan'],
+            [104, 'الهمزة', 'The Traducer', 'Al-Humazah', 9, 'Meccan'],
+            [105, 'الفيل', 'The Elephant', 'Al-Fil', 5, 'Meccan'],
+            [106, 'قريش', 'Quraysh', 'Quraysh', 4, 'Meccan'],
+            [107, 'الماعون', 'The Small Kindnesses', 'Al-Ma\'un', 7, 'Meccan'],
+            [108, 'الكوثر', 'The Abundance', 'Al-Kawthar', 3, 'Meccan'],
+            [109, 'الكافرون', 'The Disbelievers', 'Al-Kafirun', 6, 'Meccan'],
+            [110, 'النصر', 'The Divine Support', 'An-Nasr', 3, 'Medinan'],
+            [111, 'المسد', 'The Palm Fiber', 'Al-Masad', 5, 'Meccan'],
+            [112, 'الإخلاص', 'The Sincerity', 'Al-Ikhlas', 4, 'Meccan'],
+            [113, 'الفلق', 'The Daybreak', 'Al-Falaq', 5, 'Meccan'],
+            [114, 'الناس', 'Mankind', 'An-Nas', 6, 'Meccan'],
+        ];
+
+        foreach ($surahs as $s) {
+            QuranSurah::updateOrCreate(
+                ['number' => $s[0]],
+                [
+                    'name_arabic' => $s[1],
+                    'name_english' => $s[2],
+                    'name_transliteration' => $s[3],
+                    'total_ayahs' => $s[4],
+                    'revelation_type' => $s[5],
+                ]
+            );
+        }
+
+        // 30 Juz boundaries
+        $juzs = [
+            [1, 'الم', 1, 1, 2, 141],
+            [2, 'سيقول', 2, 142, 2, 252],
+            [3, 'تلك الرسل', 2, 253, 3, 92],
+            [4, 'لن تنالوا', 3, 93, 4, 23],
+            [5, 'والمحصنات', 4, 24, 4, 147],
+            [6, 'لا يحب الله', 4, 148, 5, 81],
+            [7, 'وإذا سمعوا', 5, 82, 6, 110],
+            [8, 'ولو أننا', 6, 111, 7, 87],
+            [9, 'قال الملأ', 7, 88, 8, 40],
+            [10, 'واعلموا', 8, 41, 9, 92],
+            [11, 'يعتذرون', 9, 93, 11, 5],
+            [12, 'وما من دابة', 11, 6, 12, 52],
+            [13, 'وما أبرئ', 12, 53, 14, 52],
+            [14, 'ربما', 15, 1, 16, 128],
+            [15, 'سبحان الذي', 17, 1, 18, 74],
+            [16, 'قال ألم', 18, 75, 20, 135],
+            [17, 'اقترب', 21, 1, 22, 78],
+            [18, 'قد أفلح', 23, 1, 25, 20],
+            [19, 'وقال الذين', 25, 21, 27, 55],
+            [20, 'أمن خلق', 27, 56, 29, 45],
+            [21, 'اتل ما أوحي', 29, 46, 33, 30],
+            [22, 'ومن يقنت', 33, 31, 34, 54],
+            [23, 'وما أنزلنا', 35, 1, 36, 83],
+            [24, 'فمن أظلم', 39, 32, 41, 46],
+            [25, 'إليه يرد', 41, 47, 45, 37],
+            [26, 'حم', 46, 1, 51, 30],
+            [27, 'قال فما خطبكم', 51, 31, 57, 29],
+            [28, 'قد سمع الله', 58, 1, 66, 12],
+            [29, 'تبارك الذي', 67, 1, 77, 50],
+            [30, 'عم يتساءلون', 78, 1, 114, 6],
+        ];
+
+        foreach ($juzs as $j) {
+            QuranJuz::updateOrCreate(
+                ['number' => $j[0]],
+                [
+                    'name_arabic' => $j[1],
+                    'start_surah_number' => $j[2],
+                    'start_ayah' => $j[3],
+                    'end_surah_number' => $j[4],
+                    'end_ayah' => $j[5],
+                ]
+            );
+        }
+    }
+}

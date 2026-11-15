@@ -127,6 +127,12 @@ const getStatusBadgeClass = (s) => {
             Upload Document
           </button>
           <Link
+            :href="route('hifz.student.profile', student.id)"
+            class="px-3.5 py-2 rounded-lg bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800 shadow-sm hover:bg-emerald-100 transition flex items-center gap-1.5"
+          >
+            <span>📖</span> Qur'an Profile
+          </Link>
+          <Link
             :href="route('students.edit', student.id)"
             class="px-3.5 py-2 rounded-lg bg-emerald-600 text-xs font-semibold text-white shadow-sm hover:bg-emerald-500 transition"
           >

@@ -7,6 +7,7 @@ use App\Domain\Auth\Http\Controllers\AuthenticatedSessionController;
 use App\Domain\Auth\Http\Controllers\PasswordResetController;
 use App\Domain\Auth\Http\Controllers\UserInvitationController;
 use App\Domain\Finance\Http\Controllers\FinanceController;
+use App\Domain\Hifz\Http\Controllers\HifzController;
 use App\Domain\Institution\Http\Controllers\DashboardController;
 use App\Domain\Institution\Http\Controllers\InstitutionRegistrationController;
 use App\Domain\Institution\Http\Controllers\PlatformInstitutionController;
@@ -108,5 +109,16 @@ Route::middleware(['auth', 'tenant'])->group(function () {
         Route::get('/invoices', [FinanceController::class, 'index'])->name('invoices.index');
         Route::post('/invoices', [FinanceController::class, 'store'])->name('invoices.store');
         Route::get('/invoices/{id}', [FinanceController::class, 'show'])->name('invoices.show');
+    });
+
+    // Qur'an & Hifz Progress
+    Route::prefix('hifz')->name('hifz.')->group(function () {
+        Route::get('/', [HifzController::class, 'index'])->name('index');
+        Route::get('/fast-entry', [HifzController::class, 'fastEntry'])->name('fast-entry');
+        Route::post('/entries', [HifzController::class, 'store'])->name('entries.store');
+        Route::get('/students/{student}', [HifzController::class, 'studentProfile'])->name('student.profile');
+        Route::post('/students/{student}/targets', [HifzController::class, 'storeTarget'])->name('student.targets.store');
+        Route::post('/students/{student}/certifications', [HifzController::class, 'storeCertification'])->name('student.certifications.store');
+        Route::get('/students/{student}/compare', [HifzController::class, 'compareProgress'])->name('student.compare');
     });
 });
