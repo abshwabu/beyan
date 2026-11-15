@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'madrasa_management' => 'Sirna Bulchiinsa Madarasaa',
+    'institution' => 'Dhaabbata',
+    'institutions' => 'Dhaabbilee',
+    'academic_years' => 'Waggoota Barnootaa',
+    'academic_year' => 'Bara Barnootaa',
+    'terms' => 'Kurmaanaalee',
+    'term' => 'Kurmaana',
+    'students' => 'Barattoota',
+    'teachers' => 'Barsiisota / Ustaazota',
+    'attendance' => 'Hordoffii Argamaa',
+    'hifz' => 'Hordoffii Hifzii',
+    'finance' => 'Faayinaansii',
+    'reports' => 'Gabaasota',
+    'dashboard' => 'Gabaasa Waliigalaa',
+    'register_institution' => 'Dhaabbata Galmeessi',
+    'modes' => [
+        'online' => 'Toora Intarneetiin (Online)',
+        'physical' => 'Qaamaan (Physical)',
+        'hybrid' => 'Makaa (Hybrid)',
+    ],
+    'statuses' => [
+        'active' => 'Hojirra kan jiru',
+        'suspended' => 'Kan dhorkame',
+        'inactive' => 'Hojirra kan hin jirre',
+    ],
+    'roles' => [
+        'owner' => 'Abbaa Qabeenyaa',
+        'admin' => 'Bulchaa',
+        'teacher' => 'Barsiisaa / Ustaaza',
+        'student' => 'Barataa',
+        'guardian' => 'Guddistuu / Maatii',
+    ],
+    'timezone' => "Sa'aatii Naannoo",
+    'currency' => 'Gosa Maallaqaa',
+    'locale' => 'Afaan',
+    'direction' => 'ltr',
+];

@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'madrasa_management' => 'Madrasa Management System',
+    'institution' => 'Institution',
+    'institutions' => 'Institutions',
+    'academic_years' => 'Academic Years',
+    'academic_year' => 'Academic Year',
+    'terms' => 'Terms',
+    'term' => 'Term',
+    'students' => 'Students',
+    'teachers' => 'Teachers',
+    'attendance' => 'Attendance',
+    'hifz' => 'Hifz Tracking',
+    'finance' => 'Finance',
+    'reports' => 'Reports',
+    'dashboard' => 'Dashboard',
+    'register_institution' => 'Register Institution',
+    'modes' => [
+        'online' => 'Online',
+        'physical' => 'Physical Campus',
+        'hybrid' => 'Hybrid',
+    ],
+    'statuses' => [
+        'active' => 'Active',
+        'suspended' => 'Suspended',
+        'inactive' => 'Inactive',
+    ],
+    'roles' => [
+        'owner' => 'Owner',
+        'admin' => 'Administrator',
+        'teacher' => 'Teacher / Ustadh',
+        'student' => 'Student',
+        'guardian' => 'Guardian / Parent',
+    ],
+    'timezone' => 'Timezone',
+    'currency' => 'Currency',
+    'locale' => 'Language',
+    'direction' => 'ltr',
+];

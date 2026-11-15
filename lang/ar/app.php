@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'madrasa_management' => 'نظام إدارة المدرسة القرآنية',
+    'institution' => 'المؤسسة',
+    'institutions' => 'المؤسسات',
+    'academic_years' => 'السنوات الدراسية',
+    'academic_year' => 'السنة الدراسية',
+    'terms' => 'الفصول الدراسية',
+    'term' => 'الفصل الدراسي',
+    'students' => 'الطلاب',
+    'teachers' => 'المعلمون / المشايخ',
+    'attendance' => 'سجل الحضور والغياب',
+    'hifz' => 'متابعة حفظ القرآن الكريم',
+    'finance' => 'الشؤون المالية',
+    'reports' => 'التقارير والإحصاءات',
+    'dashboard' => 'لوحة التحكم',
+    'register_institution' => 'تسجيل مدرسة جديدة',
+    'modes' => [
+        'online' => 'عبر الإنترنت',
+        'physical' => 'حضوري',
+        'hybrid' => 'مدمج (حضوري وعن بعد)',
+    ],
+    'statuses' => [
+        'active' => 'نشط',
+        'suspended' => 'معلق',
+        'inactive' => 'غير نشط',
+    ],
+    'roles' => [
+        'owner' => 'المالك / المدير العام',
+        'admin' => 'المشرف الإداري',
+        'teacher' => 'أستاذ / شيخ الحلقة',
+        'student' => 'طالب',
+        'guardian' => 'ولي الأمر',
+    ],
+    'timezone' => 'المنطقة الزمنية',
+    'currency' => 'العملة',
+    'locale' => 'اللغة',
+    'direction' => 'rtl',
+];

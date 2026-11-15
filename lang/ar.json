@@ -1,0 +1,23 @@
+{
+    "Madrasa Management System": "نظام إدارة المدرسة القرآنية",
+    "Institution": "المؤسسة",
+    "Institutions": "المؤسسات",
+    "Academic Year": "السنة الدراسية",
+    "Academic Years": "السنوات الدراسية",
+    "Term": "الفصل الدراسي",
+    "Terms": "الفصول الدراسية",
+    "Students": "الطلاب",
+    "Teachers": "المعلمون",
+    "Attendance": "سجل الحضور والغياب",
+    "Hifz Tracking": "متابعة حفظ القرآن الكريم",
+    "Finance": "الشؤون المالية",
+    "Reports": "التقارير والإحصاءات",
+    "Dashboard": "لوحة التحكم",
+    "Register Institution": "تسجيل مدرسة جديدة",
+    "Online": "عبر الإنترنت",
+    "Physical Campus": "حضوري",
+    "Hybrid": "مدمج",
+    "Active": "نشط",
+    "Suspended": "معلق",
+    "Inactive": "غير نشط"
+}

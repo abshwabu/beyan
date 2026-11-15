@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'madrasa_management' => 'የመድረሳ አስተዳደር ሥርዓት',
+    'institution' => 'ተቋም',
+    'institutions' => 'ተቋማት',
+    'academic_years' => 'የትምህርት ዘመናት',
+    'academic_year' => 'የትምህርት ዘመን',
+    'terms' => 'ወቅቶች',
+    'term' => 'ወቅት',
+    'students' => 'ተማሪዎች',
+    'teachers' => 'አስተማሪዎች / ኡስታዞች',
+    'attendance' => 'የመገኘት መቆጣጠሪያ',
+    'hifz' => 'የሂፍዝ ክትትል',
+    'finance' => 'ፋይናንስ',
+    'reports' => 'ሪፖርቶች',
+    'dashboard' => 'ዳሽቦርድ',
+    'register_institution' => 'ተቋም ይመዝግቡ',
+    'modes' => [
+        'online' => 'በመስመር ላይ (ኦንላይን)',
+        'physical' => 'በአካል (ግቢ)',
+        'hybrid' => 'ድብልቅ (ሃይብሪድ)',
+    ],
+    'statuses' => [
+        'active' => 'ንቁ',
+        'suspended' => 'የታገደ',
+        'inactive' => 'ቦዝኗል',
+    ],
+    'roles' => [
+        'owner' => 'ባለቤት',
+        'admin' => 'አስተዳዳሪ',
+        'teacher' => 'አስተማሪ / ኡስታዝ',
+        'student' => 'ተማሪ',
+        'guardian' => 'አሳዳጊ / ወላጅ',
+    ],
+    'timezone' => 'የሰዓት ሰቅ',
+    'currency' => 'የገንዘብ ምንዛሬ',
+    'locale' => 'ቋንቋ',
+    'direction' => 'ltr',
+];
