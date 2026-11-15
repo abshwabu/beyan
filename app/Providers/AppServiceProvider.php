@@ -9,6 +9,8 @@ use App\Domain\Finance\Policies\FinancePolicy;
 use App\Domain\Institution\Tenancy\TenantManager;
 use App\Domain\Students\Models\Student;
 use App\Domain\Students\Policies\StudentPolicy;
+use App\Domain\Students\Search\LikeStudentSearch;
+use App\Domain\Students\Search\StudentSearchInterface;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,6 +26,11 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->alias(TenantManager::class, 'tenant.manager');
+
+        $this->app->bind(
+            StudentSearchInterface::class,
+            LikeStudentSearch::class
+        );
     }
 
     /**

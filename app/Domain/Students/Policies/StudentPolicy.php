@@ -41,8 +41,12 @@ class StudentPolicy
                 return true;
             }
 
-            if ($user->hasRole('Guardian') && $student->guardian_id === $user->id) {
-                return true;
+            if ($user->hasRole('Guardian')) {
+                if ($student->guardian_id === $user->id) {
+                    return true;
+                }
+
+                return $student->guardians()->where('guardians.user_id', $user->id)->exists();
             }
         }
 

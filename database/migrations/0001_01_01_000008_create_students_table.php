@@ -16,16 +16,22 @@ return new class extends Migration
             $table->foreignUlid('institution_id')->constrained('institutions')->cascadeOnDelete();
             $table->string('user_id', 26)->nullable()->index();
             $table->string('guardian_id', 26)->nullable()->index();
-            $table->string('name');
-            $table->string('admission_number');
+            $table->string('full_name');
+            $table->string('name')->nullable();
+            $table->string('student_code');
+            $table->string('admission_number')->nullable();
             $table->string('gender', 10)->default('male');
             $table->date('date_of_birth')->nullable();
-            $table->string('status', 20)->default('active');
+            $table->json('contact')->nullable();
+            $table->date('admission_date')->nullable();
+            $table->string('status', 20)->default('active'); // active|inactive|suspended|withdrawn|graduated
             $table->timestamps();
 
+            $table->unique(['institution_id', 'student_code']);
             $table->unique(['institution_id', 'admission_number']);
+            $table->index(['institution_id', 'status']);
+            $table->index(['institution_id', 'full_name']);
             $table->index('institution_id');
-            $table->index('status');
         });
 
         Schema::create('student_teacher', function (Blueprint $table) {

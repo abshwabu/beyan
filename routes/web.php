@@ -76,10 +76,17 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     // Students
     Route::prefix('students')->name('students.')->group(function () {
         Route::get('/', [StudentController::class, 'index'])->name('index');
+        Route::get('/create', [StudentController::class, 'create'])->name('create');
         Route::post('/', [StudentController::class, 'store'])->name('store');
         Route::get('/{id}', [StudentController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [StudentController::class, 'edit'])->name('edit');
         Route::put('/{id}', [StudentController::class, 'update'])->name('update');
         Route::delete('/{id}', [StudentController::class, 'delete'])->name('delete');
+        Route::post('/{id}/status', [StudentController::class, 'changeStatus'])->name('status');
+        Route::post('/{id}/transfer', [StudentController::class, 'transferClass'])->name('transfer');
+        Route::post('/{id}/documents', [StudentController::class, 'uploadDocument'])->name('documents.upload');
+        Route::get('/{id}/documents/{documentId}/download', [StudentController::class, 'downloadDocument'])->name('documents.download');
+        Route::delete('/{id}/documents/{documentId}', [StudentController::class, 'deleteDocument'])->name('documents.delete');
     });
 
     // Attendance

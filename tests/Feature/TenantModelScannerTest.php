@@ -34,6 +34,7 @@ class TenantModelScannerTest extends TestCase
         'model_has_permissions',
         'role_has_permissions',
         'student_teacher',
+        'guardian_student',
     ];
 
     public function test_all_models_with_institution_id_use_belongs_to_institution_trait(): void
