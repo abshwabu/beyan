@@ -3,11 +3,14 @@
 namespace App\Domain\Institution\Tenancy;
 
 use App\Domain\Institution\Models\Institution;
+use Spatie\Permission\PermissionRegistrar;
 
 class TenantManager
 {
     protected ?Institution $tenant = null;
+
     protected bool $bypassed = false;
+
     protected bool $strict = false;
 
     /**
@@ -16,6 +19,10 @@ class TenantManager
     public function setTenant(?Institution $tenant): self
     {
         $this->tenant = $tenant;
+
+        if (class_exists(PermissionRegistrar::class)) {
+            app(PermissionRegistrar::class)->setPermissionsTeamId($tenant?->id);
+        }
 
         return $this;
     }

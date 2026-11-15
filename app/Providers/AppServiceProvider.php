@@ -2,7 +2,14 @@
 
 namespace App\Providers;
 
+use App\Domain\Attendance\Models\AttendanceRecord;
+use App\Domain\Attendance\Policies\AttendancePolicy;
+use App\Domain\Finance\Models\FeeInvoice;
+use App\Domain\Finance\Policies\FinancePolicy;
 use App\Domain\Institution\Tenancy\TenantManager;
+use App\Domain\Students\Models\Student;
+use App\Domain\Students\Policies\StudentPolicy;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -25,6 +32,25 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->ensureSqlitePermissions();
+
+        Gate::policy(
+            Student::class,
+            StudentPolicy::class
+        );
+
+        Gate::policy(
+            AttendanceRecord::class,
+            AttendancePolicy::class
+        );
+
+        Gate::policy(
+            FeeInvoice::class,
+            FinancePolicy::class
+        );
+
+        Gate::before(function ($user, $ability) {
+            return method_exists($user, 'isPlatformSuperAdmin') && $user->isPlatformSuperAdmin() ? true : null;
+        });
     }
 
     /**

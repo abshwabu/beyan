@@ -5,13 +5,14 @@ namespace App\Domain\Institution\Actions;
 use App\Domain\Academics\Models\AcademicYear;
 use App\Domain\Academics\Models\Term;
 use App\Domain\Auth\Models\User;
+use App\Domain\Auth\Services\RolePermissionMatrix;
 use App\Domain\Institution\Events\InstitutionRegistered;
 use App\Domain\Institution\Models\Institution;
-use DomainException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Spatie\Permission\PermissionRegistrar;
 
 class RegisterInstitutionAction
 {
@@ -91,6 +92,14 @@ class RegisterInstitutionAction
                 'end_date' => $now->copy()->startOfYear()->addMonths(4)->toDateString(),
                 'is_current' => true,
             ]);
+
+            // Seed institution roles and assign Owner role to the new user
+            $matrix = new RolePermissionMatrix;
+            $matrix->seedPermissions();
+            $matrix->seedInstitutionRoles($institution->id);
+
+            app(PermissionRegistrar::class)->setPermissionsTeamId($institution->id);
+            $user->assignRole('Owner');
 
             return [
                 'institution' => $institution,

@@ -28,6 +28,12 @@ class TenantModelScannerTest extends TestCase
         'jobs',
         'job_batches',
         'failed_jobs',
+        'roles',
+        'permissions',
+        'model_has_roles',
+        'model_has_permissions',
+        'role_has_permissions',
+        'student_teacher',
     ];
 
     public function test_all_models_with_institution_id_use_belongs_to_institution_trait(): void
@@ -123,7 +129,8 @@ class TenantModelScannerTest extends TestCase
     public function test_scanner_flags_any_model_lacking_trait(): void
     {
         // An anonymous or dynamic test class representing a flawed tenant model
-        $flawedModel = new class extends Model {
+        $flawedModel = new class extends Model
+        {
             protected $table = 'academic_years'; // table has institution_id, but class omits BelongsToInstitution
         };
 

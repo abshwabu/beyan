@@ -16,12 +16,19 @@ class TenantIsolationTest extends TestCase
     use RefreshDatabase;
 
     protected Institution $institutionA;
+
     protected Institution $institutionB;
+
     protected User $userA;
+
     protected User $userB;
+
     protected AcademicYear $yearA;
+
     protected AcademicYear $yearB;
+
     protected Term $termA;
+
     protected Term $termB;
 
     protected function setUp(): void

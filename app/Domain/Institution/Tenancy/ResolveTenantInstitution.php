@@ -4,6 +4,7 @@ namespace App\Domain\Institution\Tenancy;
 
 use Closure;
 use Illuminate\Http\Request;
+use Spatie\Permission\PermissionRegistrar;
 use Symfony\Component\HttpFoundation\Response;
 
 class ResolveTenantInstitution
@@ -20,6 +21,15 @@ class ResolveTenantInstitution
         $user = $request->user();
 
         if ($user) {
+            // Platform Super Admin operates outside any institution
+            if (empty($user->institution_id) && $user->isPlatformSuperAdmin()) {
+                $this->tenantManager->clear();
+                app(PermissionRegistrar::class)->setPermissionsTeamId(null);
+                $request->attributes->set('is_platform_admin', true);
+
+                return $next($request);
+            }
+
             $institution = $user->institution;
 
             if (! $institution) {
@@ -36,6 +46,9 @@ class ResolveTenantInstitution
 
             $this->tenantManager->setTenant($institution);
             $this->tenantManager->setStrict(true);
+
+            // Sync Spatie team context with current tenant
+            app(PermissionRegistrar::class)->setPermissionsTeamId($institution->id);
 
             if ($institution->locale && in_array($institution->locale, ['en', 'am', 'om', 'ar'], true)) {
                 app()->setLocale($institution->locale);

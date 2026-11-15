@@ -14,7 +14,9 @@ use Tests\TestCase;
 class BackupAndRestoreTest extends TestCase
 {
     protected string $testDbPath;
+
     protected string $originalDbPath;
+
     protected string $backupDir;
 
     protected function setUp(): void

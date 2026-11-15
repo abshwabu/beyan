@@ -230,4 +230,19 @@ return [
 
     'serialization' => 'json',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Session Blocking / Lock Time
+    |--------------------------------------------------------------------------
+    |
+    | Prevents session race conditions by acquiring a cache lock with a short
+    | timeout for concurrent requests from the same session.
+    |
+    */
+
+    'block' => env('SESSION_BLOCK', true),
+    'block_store' => env('SESSION_BLOCK_STORE', null),
+    'block_lock_seconds' => (int) env('SESSION_BLOCK_LOCK_SECONDS', 5),
+    'block_wait_seconds' => (int) env('SESSION_BLOCK_WAIT_SECONDS', 5),
+
 ];

@@ -5,6 +5,7 @@ namespace App\Domain\Institution\Models;
 use App\Domain\Academics\Models\AcademicYear;
 use App\Domain\Academics\Models\Term;
 use App\Domain\Auth\Models\User;
+use App\Domain\Institution\Audit\Auditable;
 use Carbon\CarbonInterface;
 use Database\Factories\InstitutionFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -15,7 +16,7 @@ use Illuminate\Support\Carbon;
 
 class Institution extends Model
 {
-    use HasFactory, HasUlids;
+    use Auditable, HasFactory, HasUlids;
 
     protected $table = 'institutions';
 

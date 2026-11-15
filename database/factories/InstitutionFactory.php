@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Domain\Institution\Models\Institution>
+ * @extends Factory<Institution>
  */
 class InstitutionFactory extends Factory
 {

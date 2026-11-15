@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->ulid('id')->primary();
-            $table->foreignUlid('institution_id')->constrained('institutions')->cascadeOnDelete();
+            $table->foreignUlid('institution_id')->nullable()->constrained('institutions')->cascadeOnDelete();
             $table->string('name');
             $table->string('email');
             $table->string('role')->default('owner'); // owner, admin, teacher, student, guardian, staff

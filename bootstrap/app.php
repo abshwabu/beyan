@@ -1,5 +1,8 @@
 <?php
 
+use App\Domain\Auth\Http\Middleware\EnsurePlatformSuperAdmin;
+use App\Domain\Institution\Tenancy\ResolveTenantInstitution;
+use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,11 +16,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'tenant' => \App\Domain\Institution\Tenancy\ResolveTenantInstitution::class,
+            'tenant' => ResolveTenantInstitution::class,
+            'platform.admin' => EnsurePlatformSuperAdmin::class,
         ]);
         $middleware->web(append: [
-            \App\Domain\Institution\Tenancy\ResolveTenantInstitution::class,
-            \App\Http\Middleware\HandleInertiaRequests::class,
+            ResolveTenantInstitution::class,
+            HandleInertiaRequests::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

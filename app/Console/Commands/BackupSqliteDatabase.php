@@ -71,7 +71,7 @@ class BackupSqliteDatabase extends Command
             File::delete($destinationPath);
         }
 
-        $this->info("Starting SQLite VACUUM INTO backup...");
+        $this->info('Starting SQLite VACUUM INTO backup...');
 
         try {
             $pdo = DB::connection('sqlite')->getPdo();

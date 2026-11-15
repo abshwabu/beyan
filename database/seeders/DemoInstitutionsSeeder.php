@@ -5,11 +5,13 @@ namespace Database\Seeders;
 use App\Domain\Academics\Models\AcademicYear;
 use App\Domain\Academics\Models\Term;
 use App\Domain\Auth\Models\User;
+use App\Domain\Auth\Services\RolePermissionMatrix;
 use App\Domain\Institution\Models\Institution;
 use App\Domain\Institution\Tenancy\TenantManager;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\PermissionRegistrar;
 
 class DemoInstitutionsSeeder extends Seeder
 {
@@ -23,12 +25,35 @@ class DemoInstitutionsSeeder extends Seeder
 
         // Run seeding without global tenant scope restrictions
         $tenantManager->withoutTenantScope(function () {
-            $this->seedBeyanAcademy();
-            $this->seedAlHudaAcademy();
+            $matrix = new RolePermissionMatrix;
+            $matrix->seedPermissions();
+            $matrix->seedPlatformRole();
+
+            $this->seedPlatformSuperAdmin();
+            $this->seedBeyanAcademy($matrix);
+            $this->seedAlHudaAcademy($matrix);
         });
     }
 
-    protected function seedBeyanAcademy(): void
+    protected function seedPlatformSuperAdmin(): void
+    {
+        app(PermissionRegistrar::class)->setPermissionsTeamId(null);
+
+        $admin = User::withoutInstitutionScope()->updateOrCreate(
+            ['email' => 'superadmin@beyan.platform'],
+            [
+                'institution_id' => null,
+                'name' => 'Platform Super Admin',
+                'role' => 'platform_super_admin',
+                'password' => Hash::make('Password123!'),
+                'email_verified_at' => Carbon::now(),
+            ]
+        );
+
+        $admin->assignRole('Platform Super Admin');
+    }
+
+    protected function seedBeyanAcademy(RolePermissionMatrix $matrix): void
     {
         $institution = Institution::updateOrCreate(
             ['slug' => 'beyan-academy'],
@@ -49,8 +74,11 @@ class DemoInstitutionsSeeder extends Seeder
             ]
         );
 
+        $matrix->seedInstitutionRoles($institution->id);
+        app(PermissionRegistrar::class)->setPermissionsTeamId($institution->id);
+
         // Owner User
-        User::withoutInstitutionScope()->updateOrCreate(
+        $owner = User::withoutInstitutionScope()->updateOrCreate(
             [
                 'institution_id' => $institution->id,
                 'email' => 'admin@beyan.edu.et',
@@ -63,9 +91,10 @@ class DemoInstitutionsSeeder extends Seeder
                 'email_verified_at' => Carbon::now(),
             ]
         );
+        $owner->assignRole('Owner');
 
         // Teacher User
-        User::withoutInstitutionScope()->updateOrCreate(
+        $teacher = User::withoutInstitutionScope()->updateOrCreate(
             [
                 'institution_id' => $institution->id,
                 'email' => 'teacher@beyan.edu.et',
@@ -78,6 +107,7 @@ class DemoInstitutionsSeeder extends Seeder
                 'email_verified_at' => Carbon::now(),
             ]
         );
+        $teacher->assignRole('Teacher');
 
         // Academic Year
         $academicYear = AcademicYear::withoutInstitutionScope()->updateOrCreate(
@@ -133,7 +163,7 @@ class DemoInstitutionsSeeder extends Seeder
         );
     }
 
-    protected function seedAlHudaAcademy(): void
+    protected function seedAlHudaAcademy(RolePermissionMatrix $matrix): void
     {
         $institution = Institution::updateOrCreate(
             ['slug' => 'alhuda-academy'],
@@ -154,8 +184,11 @@ class DemoInstitutionsSeeder extends Seeder
             ]
         );
 
+        $matrix->seedInstitutionRoles($institution->id);
+        app(PermissionRegistrar::class)->setPermissionsTeamId($institution->id);
+
         // Owner User
-        User::withoutInstitutionScope()->updateOrCreate(
+        $owner = User::withoutInstitutionScope()->updateOrCreate(
             [
                 'institution_id' => $institution->id,
                 'email' => 'admin@alhuda.edu.et',
@@ -168,9 +201,10 @@ class DemoInstitutionsSeeder extends Seeder
                 'email_verified_at' => Carbon::now(),
             ]
         );
+        $owner->assignRole('Owner');
 
         // Teacher User
-        User::withoutInstitutionScope()->updateOrCreate(
+        $teacher = User::withoutInstitutionScope()->updateOrCreate(
             [
                 'institution_id' => $institution->id,
                 'email' => 'teacher@alhuda.edu.et',
@@ -183,6 +217,7 @@ class DemoInstitutionsSeeder extends Seeder
                 'email_verified_at' => Carbon::now(),
             ]
         );
+        $teacher->assignRole('Teacher');
 
         // Academic Year
         $academicYear = AcademicYear::withoutInstitutionScope()->updateOrCreate(
