@@ -109,6 +109,21 @@ Route::middleware(['auth', 'tenant'])->group(function () {
         Route::get('/invoices', [FinanceController::class, 'index'])->name('invoices.index');
         Route::post('/invoices', [FinanceController::class, 'store'])->name('invoices.store');
         Route::get('/invoices/{id}', [FinanceController::class, 'show'])->name('invoices.show');
+        Route::post('/invoices/{id}/payments', [FinanceController::class, 'recordPayment'])->name('invoices.payments.store');
+        Route::post('/invoices/{id}/remind', [FinanceController::class, 'sendReminder'])->name('invoices.remind');
+
+        Route::post('/payments/{id}/reversal', [FinanceController::class, 'recordReversal'])->name('payments.reversal');
+        Route::get('/payments/{id}/receipt', [FinanceController::class, 'receipt'])->name('payments.receipt');
+
+        Route::get('/fee-plans', [FinanceController::class, 'feePlans'])->name('fee-plans.index');
+        Route::post('/fee-plans', [FinanceController::class, 'storeFeePlan'])->name('fee-plans.store');
+        Route::post('/students/{student}/discounts', [FinanceController::class, 'storeStudentDiscount'])->name('students.discounts.store');
+
+        Route::get('/expenses', [FinanceController::class, 'expenses'])->name('expenses.index');
+        Route::post('/expenses', [FinanceController::class, 'storeExpense'])->name('expenses.store');
+
+        Route::get('/reports/income-expense', [FinanceController::class, 'incomeExpenseReport'])->name('reports.income-expense');
+        Route::get('/reminders', [FinanceController::class, 'overdueReminders'])->name('reminders.index');
     });
 
     // Qur'an & Hifz Progress

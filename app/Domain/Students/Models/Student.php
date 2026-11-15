@@ -5,6 +5,7 @@ namespace App\Domain\Students\Models;
 use App\Domain\Attendance\Models\AttendanceRecord;
 use App\Domain\Auth\Models\User;
 use App\Domain\Finance\Models\FeeInvoice;
+use App\Domain\Finance\Models\StudentDiscount;
 use App\Domain\Hifz\Models\HifzCertification;
 use App\Domain\Hifz\Models\HifzEntry;
 use App\Domain\Hifz\Models\HifzTarget;
@@ -171,6 +172,11 @@ class Student extends Model
     public function feeInvoices(): HasMany
     {
         return $this->hasMany(FeeInvoice::class, 'student_id');
+    }
+
+    public function discounts(): HasMany
+    {
+        return $this->hasMany(StudentDiscount::class, 'student_id');
     }
 
     /**

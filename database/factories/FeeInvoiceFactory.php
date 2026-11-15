@@ -13,16 +13,22 @@ class FeeInvoiceFactory extends Factory
 
     public function definition(): array
     {
-        $amount = fake()->randomFloat(2, 500, 5000);
+        $totalAmount = fake()->numberBetween(50000, 300000); // 500 to 3000 ETB in minor units
 
         return [
             'institution_id' => Institution::factory(),
             'student_id' => Student::factory(),
-            'invoice_number' => 'INV-'.fake()->unique()->numberBetween(10000, 99999),
+            'fee_plan_id' => null,
+            'invoice_number' => 'INV-'.fake()->unique()->numerify('#####'),
             'title' => 'Term Tuition Fee',
-            'amount' => $amount,
+            'period' => '2026-11',
+            'subtotal' => $totalAmount,
+            'discount_total' => 0,
+            'total_amount' => $totalAmount,
+            'amount' => $totalAmount / 100,
             'paid_amount' => 0,
-            'status' => 'pending',
+            'balance_due' => $totalAmount,
+            'status' => 'unpaid',
             'due_date' => fake()->dateTimeBetween('now', '+30 days')->format('Y-m-d'),
         ];
     }
