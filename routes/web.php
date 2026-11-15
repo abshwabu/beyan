@@ -10,24 +10,20 @@ use App\Domain\Finance\Http\Controllers\FinanceController;
 use App\Domain\Hifz\Http\Controllers\HifzController;
 use App\Domain\Institution\Http\Controllers\DashboardController;
 use App\Domain\Institution\Http\Controllers\InstitutionRegistrationController;
+use App\Domain\Institution\Http\Controllers\LandingPageController;
 use App\Domain\Institution\Http\Controllers\PlatformInstitutionController;
 use App\Domain\Reports\Http\Controllers\ReportController;
 use App\Domain\Students\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// Public Root Redirect
-Route::get('/', function () {
-    if (Auth::check()) {
-        if (Auth::user()->isPlatformSuperAdmin()) {
-            return redirect()->route('platform.institutions.index');
-        }
-
-        return redirect()->route('dashboard');
-    }
-
-    return redirect()->route('login');
-});
+// Public Landing & Marketing Routes
+Route::get('/', [LandingPageController::class, 'index'])->name('home');
+Route::get('/locale/{locale}', [LandingPageController::class, 'setLocale'])->name('locale.set');
+Route::post('/demo-request', [LandingPageController::class, 'submitDemo'])->middleware('throttle:5,10')->name('demo.request');
+Route::get('/sitemap.xml', [LandingPageController::class, 'sitemap'])->name('sitemap');
+Route::get('/privacy', [LandingPageController::class, 'privacy'])->name('privacy');
+Route::get('/terms', [LandingPageController::class, 'terms'])->name('terms');
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {

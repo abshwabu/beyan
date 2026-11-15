@@ -38,6 +38,8 @@ class TenantModelScannerTest extends TestCase
         'class_group_teacher',
         'quran_surahs',
         'quran_juzs',
+        'plans',
+        'demo_requests',
     ];
 
     public function test_all_models_with_institution_id_use_belongs_to_institution_trait(): void

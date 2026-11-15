@@ -47,7 +47,9 @@ class RegisterInstitutionAction
 
         // Short write transaction strictly for database persistence.
         // No external services (HTTP, email) are called inside this block.
-        $result = DB::transaction(function () use ($data, $slug) {
+        $trialDays = (int) config('app.trial_days', 14);
+
+        $result = DB::transaction(function () use ($data, $slug, $trialDays) {
             $institution = Institution::create([
                 'name' => $data['institution_name'],
                 'slug' => $slug,
@@ -56,7 +58,8 @@ class RegisterInstitutionAction
                 'currency' => $data['currency'] ?? 'ETB',
                 'locale' => $data['locale'] ?? 'en',
                 'status' => 'active',
-                'subscription_plan' => 'pilot',
+                'subscription_plan' => $data['subscription_plan'] ?? $data['plan'] ?? 'trial',
+                'subscription_ends_at' => Carbon::now()->addDays($trialDays),
                 'contact' => [
                     'phone' => $data['phone'] ?? null,
                     'email' => $data['email'] ?? $data['owner_email'],

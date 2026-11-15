@@ -123,4 +123,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'trial_days' => (int) env('TRIAL_DAYS', 14),
+
 ];
