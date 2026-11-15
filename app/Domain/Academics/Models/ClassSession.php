@@ -30,6 +30,9 @@ class ClassSession extends Model
         'room',
         'status',
         'notes',
+        'teacher_attendance_status',
+        'teacher_checked_in_at',
+        'teacher_check_in_notes',
     ];
 
     protected function casts(): array
@@ -38,6 +41,7 @@ class ClassSession extends Model
             'scheduled_date' => 'date',
             'start_time_utc' => 'datetime',
             'end_time_utc' => 'datetime',
+            'teacher_checked_in_at' => 'datetime',
         ];
     }
 

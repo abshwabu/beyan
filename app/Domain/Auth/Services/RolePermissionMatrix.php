@@ -24,6 +24,7 @@ class RolePermissionMatrix
         'attendance:view-assigned',
         'attendance:record',
         'attendance:update',
+        'attendance:edit-past',
 
         // Finance
         'finance:view',
@@ -66,6 +67,7 @@ class RolePermissionMatrix
             'attendance:view-assigned',
             'attendance:record',
             'attendance:update',
+            'attendance:edit-past',
             'finance:view',
             'finance:manage-fees',
             'finance:record-payment',
@@ -89,6 +91,7 @@ class RolePermissionMatrix
             'attendance:view-assigned',
             'attendance:record',
             'attendance:update',
+            'attendance:edit-past',
             'finance:view',
             'finance:manage-fees',
             'finance:record-payment',
@@ -109,6 +112,7 @@ class RolePermissionMatrix
             'attendance:view',
             'attendance:record',
             'attendance:update',
+            'attendance:edit-past',
             'academics:view',
             'academics:manage',
             'audit:view',

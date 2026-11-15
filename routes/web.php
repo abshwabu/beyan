@@ -97,6 +97,9 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::prefix('attendance')->name('attendance.')->group(function () {
         Route::get('/', [AttendanceController::class, 'index'])->name('index');
         Route::post('/', [AttendanceController::class, 'store'])->name('store');
+        Route::get('/analytics', [AttendanceController::class, 'analytics'])->name('analytics');
+        Route::get('/flagged-absences', [AttendanceController::class, 'flaggedAbsences'])->name('flagged');
+        Route::post('/sessions/{sessionId}', [AttendanceController::class, 'saveSessionAttendance'])->name('sessions.save');
         Route::get('/{id}', [AttendanceController::class, 'show'])->name('show');
     });
 
