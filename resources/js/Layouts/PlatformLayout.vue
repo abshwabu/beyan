@@ -14,7 +14,11 @@ defineProps({
 });
 
 const isCurrent = (path) => {
-    return window.location.pathname.startsWith(path);
+    const currentUrl = page.url || '';
+    if (path === '/platform') {
+        return currentUrl === '/platform' || currentUrl === '/platform/' || currentUrl === '/platform/dashboard';
+    }
+    return currentUrl.startsWith(path);
 };
 </script>
 
@@ -67,7 +71,7 @@ const isCurrent = (path) => {
                     <Link
                         href="/platform"
                         class="px-3 py-1.5 rounded-md whitespace-nowrap transition"
-                        :class="window.location.pathname === '/platform' || window.location.pathname === '/platform/dashboard' ? 'bg-rose-600 text-white font-bold' : 'text-slate-300 hover:text-white hover:bg-slate-800'"
+                        :class="isCurrent('/platform') ? 'bg-rose-600 text-white font-bold' : 'text-slate-300 hover:text-white hover:bg-slate-800'"
                     >
                         Overview
                     </Link>
