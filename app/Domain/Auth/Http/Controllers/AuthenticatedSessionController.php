@@ -67,8 +67,13 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if ($user->isPlatformSuperAdmin()) {
-            return redirect()->intended(route('platform.institutions.index'));
+        if ($user->isPlatformStaff()) {
+            $intended = $request->session()->pull('url.intended');
+            if ($intended && str_contains($intended, '/platform')) {
+                return redirect()->to($intended);
+            }
+
+            return redirect()->route('platform.overview');
         }
 
         return redirect()->intended(route('dashboard'));

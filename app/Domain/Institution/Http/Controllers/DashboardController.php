@@ -9,6 +9,7 @@ use App\Domain\Institution\Services\DashboardMetricsService;
 use App\Domain\Institution\Tenancy\TenantManager;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -19,11 +20,21 @@ class DashboardController extends Controller
         protected DashboardMetricsService $metricsService
     ) {}
 
-    public function __invoke(Request $request, TenantManager $tenantManager): Response|JsonResponse
+    public function __invoke(Request $request, TenantManager $tenantManager): Response|JsonResponse|RedirectResponse
     {
-        $institution = $tenantManager->getTenant();
-        /** @var User $user */
+        /** @var User|null $user */
         $user = $request->user();
+
+        // Platform staff operating outside a tenant context belong in the platform hub
+        if ($user && $user->isPlatformStaff()) {
+            return redirect()->route('platform.overview');
+        }
+
+        $institution = $tenantManager->getTenant();
+
+        if (! $institution) {
+            abort(403, 'No institution workspace found.');
+        }
 
         // 1. Determine user dashboard role view
         $isTeacherOnly = $user->isTeacher() && ! $user->can('students:view');

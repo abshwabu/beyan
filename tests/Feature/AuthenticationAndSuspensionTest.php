@@ -107,11 +107,15 @@ class AuthenticationAndSuspensionTest extends TestCase
             'password' => 'Password123!',
         ]);
 
-        $response->assertRedirect(route('platform.institutions.index'));
+        $response->assertRedirect(route('platform.overview'));
         $this->assertAuthenticatedAs($this->superAdminUser);
 
-        $platformResponse = $this->get(route('platform.institutions.index'));
+        $platformResponse = $this->get(route('platform.overview'));
         $platformResponse->assertOk();
+
+        // Accessing tenant /dashboard directly as super admin cleanly redirects to platform hub
+        $dashboardResponse = $this->get(route('dashboard'));
+        $dashboardResponse->assertRedirect(route('platform.overview'));
     }
 
     public function test_active_user_can_authenticate_and_access_dashboard_via_session(): void
