@@ -27,6 +27,8 @@ class AuthenticationAndSuspensionTest extends TestCase
 
     protected User $inactiveUser;
 
+    protected User $superAdminUser;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -35,6 +37,14 @@ class AuthenticationAndSuspensionTest extends TestCase
         $tenantManager = app(TenantManager::class);
 
         $tenantManager->withoutTenantScope(function () {
+            // Super Admin
+            $this->superAdminUser = User::withoutInstitutionScope()->create([
+                'institution_id' => null,
+                'name' => 'Platform Super Admin',
+                'email' => 'superadmin@beyan.platform',
+                'password' => Hash::make('Password123!'),
+                'role' => 'platform_super_admin',
+            ]);
             // Active Institution
             $this->activeInstitution = Institution::factory()->create([
                 'name' => 'Active Madrasa',
@@ -88,6 +98,34 @@ class AuthenticationAndSuspensionTest extends TestCase
 
         $response->assertRedirect(route('dashboard'));
         $this->assertAuthenticatedAs($this->activeUser);
+    }
+
+    public function test_super_admin_can_login_and_access_platform_without_memory_or_recursion_error(): void
+    {
+        $response = $this->post('/login', [
+            'email' => 'superadmin@beyan.platform',
+            'password' => 'Password123!',
+        ]);
+
+        $response->assertRedirect(route('platform.institutions.index'));
+        $this->assertAuthenticatedAs($this->superAdminUser);
+
+        $platformResponse = $this->get(route('platform.institutions.index'));
+        $platformResponse->assertOk();
+    }
+
+    public function test_active_user_can_authenticate_and_access_dashboard_via_session(): void
+    {
+        $response = $this->post('/login', [
+            'email' => 'active@madrasa.org',
+            'password' => 'Password123!',
+        ]);
+
+        $response->assertRedirect(route('dashboard'));
+        $this->assertAuthenticatedAs($this->activeUser);
+
+        $dashboardResponse = $this->get(route('dashboard'));
+        $dashboardResponse->assertOk();
     }
 
     public function test_login_is_blocked_for_users_of_suspended_institutions(): void

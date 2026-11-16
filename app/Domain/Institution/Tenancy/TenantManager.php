@@ -13,6 +13,8 @@ class TenantManager
 
     protected bool $strict = false;
 
+    protected bool $resolvingUser = false;
+
     /**
      * Set the current tenant institution.
      */
@@ -36,12 +38,22 @@ class TenantManager
             return $this->tenant;
         }
 
-        // If not explicitly set and not bypassed, resolve from authenticated user
-        if (! $this->bypassed && auth()->check()) {
-            $user = auth()->user();
-            if ($user && isset($user->institution_id)) {
-                $this->tenant = $user->institution;
+        if ($this->bypassed || $this->resolvingUser) {
+            return null;
+        }
+
+        $this->resolvingUser = true;
+
+        try {
+            // If not explicitly set and not bypassed, resolve from authenticated user
+            if (auth()->check()) {
+                $user = auth()->user();
+                if ($user && isset($user->institution_id)) {
+                    $this->tenant = $user->institution;
+                }
             }
+        } finally {
+            $this->resolvingUser = false;
         }
 
         return $this->tenant;
@@ -56,11 +68,21 @@ class TenantManager
             return $this->tenant->id;
         }
 
-        if (! $this->bypassed && auth()->check()) {
-            $user = auth()->user();
-            if ($user && isset($user->institution_id)) {
-                return $user->institution_id;
+        if ($this->bypassed || $this->resolvingUser) {
+            return null;
+        }
+
+        $this->resolvingUser = true;
+
+        try {
+            if (auth()->check()) {
+                $user = auth()->user();
+                if ($user && isset($user->institution_id)) {
+                    return $user->institution_id;
+                }
             }
+        } finally {
+            $this->resolvingUser = false;
         }
 
         return null;
@@ -82,6 +104,7 @@ class TenantManager
         $this->tenant = null;
         $this->bypassed = false;
         $this->strict = false;
+        $this->resolvingUser = false;
 
         return $this;
     }
