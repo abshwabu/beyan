@@ -32,7 +32,7 @@ const submit = () => {
 <template>
   <Head :title="`Edit ${student.full_name || student.name} - Beyan`" />
 
-  <div class="min-h-screen bg-slate-50/70 py-8 px-4 sm:px-6 lg:px-8" :dir="isRtl ? 'rtl' : 'ltr'">
+  <div class="min-h-screen bg-slate-50/70 py-8 px-4 sm:px-6 lg:px-8" dir="ltr">
     <div class="max-w-3xl mx-auto space-y-6">
 
       <!-- Breadcrumbs & Header -->
@@ -65,7 +65,7 @@ const submit = () => {
           :href="route('students.show', student.id)"
           class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 px-3.5 py-2 rounded-xl bg-white border border-slate-200/90 shadow-xs hover:bg-slate-50 transition-all self-start sm:self-auto"
         >
-          <svg class="w-4 h-4 text-slate-400" :class="isRtl ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           Back to Profile

@@ -122,7 +122,7 @@ const attendanceRate = computed(() => {
 <template>
   <Head title="Attendance Management - Beyan" />
 
-  <div class="min-h-screen bg-slate-50/70 py-8 px-4 sm:px-6 lg:px-8" :dir="isRtl ? 'rtl' : 'ltr'">
+  <div class="min-h-screen bg-slate-50/70 py-8 px-4 sm:px-6 lg:px-8" dir="ltr">
     <div class="max-w-7xl mx-auto space-y-6">
 
       <!-- Breadcrumbs & Header -->

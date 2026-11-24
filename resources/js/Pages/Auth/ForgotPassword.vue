@@ -19,7 +19,7 @@ const submit = () => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8" :dir="isRtl ? 'rtl' : 'ltr'">
+    <div class="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8" dir="ltr">
         <div class="sm:mx-auto sm:w-full sm:max-w-md">
             <div class="text-center">
                 <h2 class="text-2xl font-bold text-slate-900">Reset your password</h2>

@@ -85,44 +85,53 @@ const runComparison = async () => {
 </script>
 
 <template>
-  <Head :title="profile.student.name + ' - Qur\'an & Hifz Profile'" />
+  <Head :title="`${profile.student.name} - Qur'an & Hifz Profile`" />
 
-  <div class="min-h-screen bg-slate-100 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="min-h-screen bg-slate-50/70 py-8 px-4 sm:px-6 lg:px-8" dir="ltr">
     <div class="max-w-6xl mx-auto space-y-6">
       <!-- Header Card -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
+          <nav class="flex items-center gap-2 text-xs font-medium text-slate-500 mb-1.5">
+            <Link :href="route('students.index')" class="hover:text-emerald-700 transition-colors">Students</Link>
+            <span class="text-slate-300">/</span>
+            <Link :href="route('students.show', profile.student.id)" class="hover:text-emerald-700 transition-colors">
+              {{ profile.student.student_code }}
+            </Link>
+            <span class="text-slate-300">/</span>
+            <span class="text-slate-800 font-semibold">Qur'an Profile</span>
+          </nav>
           <div class="flex items-center gap-3">
-            <span class="p-2.5 bg-emerald-600 rounded-xl text-white font-bold text-xl">📖</span>
+            <span class="p-2.5 bg-emerald-600 rounded-xl text-white font-bold text-xl shadow-sm">📖</span>
             <div>
-              <h1 class="text-2xl font-black text-slate-900">{{ profile.student.name }}</h1>
+              <h1 class="text-2xl font-bold tracking-tight text-slate-900">{{ profile.student.name }}</h1>
               <div class="flex items-center gap-3 text-xs text-slate-500 mt-0.5">
-                <span>ID: <strong class="text-slate-800">{{ profile.student.student_code }}</strong></span>
+                <span>Code: <strong class="text-slate-800 font-mono">{{ profile.student.student_code }}</strong></span>
                 <span>•</span>
-                <span class="capitalize px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold">{{ profile.student.status }}</span>
+                <span class="capitalize px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 ring-1 ring-emerald-600/20 font-bold">{{ profile.student.status }}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
           <button
             @click="showTargetModal = true"
-            class="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition"
+            class="px-3.5 py-2 text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl active:scale-[0.98] transition-all shadow-sm"
           >
             + Set Target
           </button>
           <button
             @click="showCertModal = true"
-            class="px-3.5 py-2 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition"
+            class="px-3.5 py-2 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200/80 hover:bg-indigo-100 rounded-xl active:scale-[0.98] transition-all shadow-sm"
           >
             + Issue Ijazah / Cert
           </button>
           <Link
             :href="route('hifz.fast-entry', { student_id: profile.student.id })"
-            class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow transition"
+            class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] rounded-xl shadow-sm transition-all"
           >
-            Log Entry (Fast Entry)
+            Log Fast Entry
           </Link>
         </div>
       </div>
@@ -481,9 +490,100 @@ const runComparison = async () => {
             </div>
           </div>
         </div>
-        <div v-else class="text-sm text-slate-400 py-8 text-center italic">
+        <div v-else class="text-xs text-slate-400 py-8 text-center italic">
           No certifications or Ijazahs issued yet.
         </div>
+      </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Set Target Modal -->
+    <div v-if="showTargetModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+        <h3 class="text-base font-bold text-slate-900">Configure Hifz Target</h3>
+        <form @submit.prevent="saveTarget" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700">Period *</label>
+            <select v-model="targetForm.period" class="mt-1 block w-full rounded-xl border-slate-300 text-sm focus:border-emerald-500 focus:ring-emerald-500">
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700">Target Type *</label>
+            <select v-model="targetForm.target_type" class="mt-1 block w-full rounded-xl border-slate-300 text-sm focus:border-emerald-500 focus:ring-emerald-500">
+              <option value="sabaq_ayahs">Sabaq (New Memorization) Ayahs</option>
+              <option value="sabaq_pages">Sabaq Pages</option>
+              <option value="sabqi_ayahs">Sabqi (Recent Revision) Ayahs</option>
+              <option value="sabqi_pages">Sabqi Pages</option>
+              <option value="manzil_ayahs">Manzil (Cycle Revision) Ayahs</option>
+              <option value="manzil_pages">Manzil Pages</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700">Target Value (Quantity) *</label>
+            <input v-model.number="targetForm.target_value" type="number" min="1" required class="mt-1 block w-full rounded-xl border-slate-300 text-sm focus:border-emerald-500 focus:ring-emerald-500" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700">Notes</label>
+            <textarea v-model="targetForm.notes" rows="2" placeholder="e.g. Aim for perfect tajweed on each recitation" class="mt-1 block w-full rounded-xl border-slate-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"></textarea>
+          </div>
+          <div class="flex justify-end space-x-2 pt-2">
+            <button type="button" @click="showTargetModal = false" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors">Cancel</button>
+            <button type="submit" :disabled="targetForm.processing" class="px-4 py-2 text-xs font-bold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 active:scale-[0.98] transition-all shadow-sm">Save Target</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Issue Ijazah / Certification Modal -->
+    <div v-if="showCertModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+        <h3 class="text-base font-bold text-slate-900">Issue Certification or Ijazah</h3>
+        <form @submit.prevent="saveCertification" class="space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700">Type *</label>
+              <select v-model="certForm.type" class="mt-1 block w-full rounded-xl border-slate-300 text-sm focus:border-emerald-500 focus:ring-emerald-500">
+                <option value="hifz_completion">Hifz Completion</option>
+                <option value="juz_completion">Juz Completion</option>
+                <option value="ijazah">Ijazah (Sanad)</option>
+                <option value="tajweed_certificate">Tajweed Certificate</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700">Grade</label>
+              <select v-model="certForm.grade" class="mt-1 block w-full rounded-xl border-slate-300 text-sm focus:border-emerald-500 focus:ring-emerald-500">
+                <option value="Mumtaz">Mumtaz (Distinction)</option>
+                <option value="Jayyid Jiddan">Jayyid Jiddan (Very Good)</option>
+                <option value="Jayyid">Jayyid (Good)</option>
+                <option value="Maqbul">Maqbul (Pass)</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700">Certificate Title *</label>
+            <input v-model="certForm.title" required type="text" placeholder="e.g. Full Qur'an Memorization Completion" class="mt-1 block w-full rounded-xl border-slate-300 text-sm focus:border-emerald-500 focus:ring-emerald-500" />
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700">Riwayah</label>
+              <input v-model="certForm.riwayah" type="text" placeholder="e.g. Hafs an Asim" class="mt-1 block w-full rounded-xl border-slate-300 text-sm focus:border-emerald-500 focus:ring-emerald-500" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700">Completion Date *</label>
+              <input v-model="certForm.completion_date" required type="date" class="mt-1 block w-full rounded-xl border-slate-300 text-sm focus:border-emerald-500 focus:ring-emerald-500" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700">Sanad Chain (Optional)</label>
+            <textarea v-model="certForm.sanad_chain" rows="2" placeholder="e.g. Connected through Shaykh ..." class="mt-1 block w-full rounded-xl border-slate-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"></textarea>
+          </div>
+          <div class="flex justify-end space-x-2 pt-2">
+            <button type="button" @click="showCertModal = false" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors">Cancel</button>
+            <button type="submit" :disabled="certForm.processing" class="px-4 py-2 text-xs font-bold rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-sm">Issue Certificate</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
