@@ -13,7 +13,9 @@ const safeRoute = (...args) => {
 if (typeof document !== 'undefined') {
     router.on('navigate', (event) => {
         const page = event.detail.page;
-        const direction = page.props.i18n?.direction || 'ltr';
+        // The landing page handles its own direction when translated into Arabic.
+        // All internal dashboard and management pages are authored in English and must always stay LTR.
+        const direction = page.component === 'Landing' && page.props.direction ? page.props.direction : 'ltr';
         const locale = page.props.i18n?.locale || 'en';
         document.documentElement.setAttribute('dir', direction);
         document.documentElement.setAttribute('lang', locale);

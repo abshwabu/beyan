@@ -1,6 +1,6 @@
 <script setup>
-import { computed, ref } from 'vue';
-import { usePage, Link, router } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import { usePage, Link } from '@inertiajs/vue3';
 
 const props = defineProps({
   institution: Object,
@@ -15,22 +15,6 @@ const props = defineProps({
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user);
-const isRtl = computed(() => page.props.i18n?.direction === 'rtl');
-const langMenuOpen = ref(false);
-const currentLocale = computed(() => page.props.i18n?.locale || 'en');
-const supportedLocales = computed(() => page.props.i18n?.supportedLocales || [
-  { code: 'en', name: 'English', native: 'English', dir: 'ltr' },
-  { code: 'am', name: 'Amharic', native: 'አማርኛ', dir: 'ltr' },
-  { code: 'om', name: 'Afaan Oromoo', native: 'Afaan Oromoo', dir: 'ltr' },
-  { code: 'ar', name: 'Arabic', native: 'العربية', dir: 'rtl' },
-]);
-
-const switchLocale = (code) => {
-  langMenuOpen.value = false;
-  router.visit(`/locale/${code}`, {
-    preserveScroll: true,
-  });
-};
 
 const formatCurrency = (minorUnits) => {
   if (!minorUnits) return '0.00 ETB';
@@ -39,7 +23,7 @@ const formatCurrency = (minorUnits) => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-100" :dir="isRtl ? 'rtl' : 'ltr'">
+  <div class="min-h-screen bg-slate-100" dir="ltr">
     <!-- Impersonation Banner -->
     <div v-if="$page.props.impersonation?.active" class="bg-amber-400 text-slate-900 px-4 py-2.5 font-bold text-xs sm:text-sm shadow-md flex flex-wrap items-center justify-between gap-2 border-b border-amber-500">
       <div class="flex items-center gap-2">
@@ -87,39 +71,6 @@ const formatCurrency = (minorUnits) => {
           </div>
 
           <div class="flex items-center gap-3">
-            <!-- Language Switcher -->
-            <div class="relative">
-              <button
-                type="button"
-                @click="langMenuOpen = !langMenuOpen"
-                class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition"
-                title="Change Interface Language"
-              >
-                <span>🌐</span>
-                <span class="uppercase tracking-wider text-[11px]">{{ currentLocale }}</span>
-                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              <div
-                v-if="langMenuOpen"
-                class="absolute end-0 mt-1.5 w-40 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-50 text-xs"
-              >
-                <button
-                  v-for="l in supportedLocales"
-                  :key="l.code"
-                  type="button"
-                  @click="switchLocale(l.code)"
-                  class="w-full flex items-center justify-between px-3 py-2 text-start hover:bg-slate-50 transition"
-                  :class="currentLocale === l.code ? 'font-bold text-emerald-700 bg-emerald-50/60' : 'text-slate-700'"
-                >
-                  <span>{{ l.native }}</span>
-                  <span class="text-[10px] text-slate-400 uppercase font-mono">{{ l.code }}</span>
-                </button>
-              </div>
-            </div>
-
             <div class="text-end hidden sm:block">
               <div class="text-xs font-bold text-slate-900">{{ user?.name }}</div>
               <div class="text-[10px] text-slate-500 uppercase">{{ user?.role }}</div>
