@@ -6,6 +6,8 @@ use App\Domain\Academics\Models\ClassSession;
 use App\Domain\Attendance\Actions\RecordSessionAttendanceAction;
 use App\Domain\Attendance\Models\AttendanceRecord;
 use App\Domain\Attendance\Services\AttendanceAnalyticsService;
+use App\Domain\Auth\Models\User;
+use App\Domain\Teachers\Models\Teacher;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -72,17 +74,88 @@ class AttendanceController extends Controller
             ]);
         }
 
-        $query = AttendanceRecord::with('student')->latest();
+        $query = AttendanceRecord::with(['student', 'classSession.classGroup.course', 'recorder'])->latest();
 
         if ($request->filled('student_id')) {
             $query->where('student_id', $request->input('student_id'));
         }
 
         if ($request->filled('date')) {
-            $query->where('date', $request->input('date'));
+            $query->whereDate('date', $request->input('date'));
         }
 
-        return response()->json($query->paginate(25));
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json($query->paginate(25));
+        }
+
+        /** @var User|null $user */
+        $user = auth()->user();
+        $institution = $user?->institution;
+        $tz = $institution?->timezone ?? 'Africa/Addis_Ababa';
+        $today = Carbon::now($tz)->toDateString();
+
+        // Today's sessions for instant marking
+        $todaySessionsQuery = ClassSession::with([
+            'classGroup.course',
+            'classGroup.activeEnrollments',
+            'teacher.user',
+        ])
+            ->whereDate('scheduled_date', $today)
+            ->where('status', '!=', 'cancelled');
+
+        if ($user && $user->isTeacher() && ! $user->can('attendance:view')) {
+            $teacher = $user->teacherProfile ?? Teacher::where('user_id', $user->id)->first();
+            if ($teacher) {
+                $todaySessionsQuery->where('teacher_id', $teacher->id);
+            }
+        }
+
+        $todaySessions = $todaySessionsQuery
+            ->orderBy('start_time_utc')
+            ->get()
+            ->map(function (ClassSession $s) use ($tz) {
+                $arr = $s->toTimezoneArray($tz);
+                $arr['course_name'] = $s->classGroup?->course?->name ?? 'Course';
+                $arr['class_name'] = $s->classGroup?->name ?? 'Class';
+                $arr['teacher_name'] = $s->teacher?->full_name ?? $s->teacher?->user?->name ?? 'Assigned Teacher';
+                $arr['enrolled_count'] = $s->classGroup?->activeEnrollments?->count() ?? 0;
+                $arr['attendance_url'] = route('attendance.index', ['session_id' => $s->id]);
+                $arr['is_marked'] = AttendanceRecord::where('class_session_id', $s->id)->exists();
+
+                return $arr;
+            });
+
+        // Today's attendance counts
+        $todayCounts = [
+            'total' => AttendanceRecord::whereDate('date', $today)->count(),
+            'present' => AttendanceRecord::whereDate('date', $today)->where('status', 'present')->count(),
+            'absent' => AttendanceRecord::whereDate('date', $today)->where('status', 'absent')->count(),
+            'late' => AttendanceRecord::whereDate('date', $today)->where('status', 'late')->count(),
+            'excused' => AttendanceRecord::whereDate('date', $today)->where('status', 'excused')->count(),
+        ];
+
+        // Repeated absences alerts
+        $flaggedStudents = [];
+        if ($institution) {
+            try {
+                $flaggedStudents = $this->analyticsService->detectRepeatedAbsences($institution->id, 3);
+            } catch (\Throwable $e) {
+                $flaggedStudents = [];
+            }
+        }
+
+        return Inertia::render('Attendance/Index', [
+            'records' => $query->paginate(25)->withQueryString(),
+            'todaySessions' => $todaySessions,
+            'todayCounts' => $todayCounts,
+            'flagged' => $flaggedStudents,
+            'filters' => $request->only(['student_id', 'date', 'status']),
+            'today' => $today,
+        ]);
     }
 
     /**
