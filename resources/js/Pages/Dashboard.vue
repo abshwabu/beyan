@@ -63,9 +63,11 @@ const formatCurrency = (minorUnits) => {
           <!-- Main Nav Links -->
           <div class="hidden md:flex items-center space-x-4 text-xs font-bold text-slate-600">
             <Link :href="route('students.index')" class="hover:text-emerald-700 transition">Students</Link>
+            <Link v-if="!is_teacher_only" :href="route('classes.index')" class="hover:text-emerald-700 transition">Classes</Link>
             <Link :href="route('timetable.today')" class="hover:text-emerald-700 transition">Timetable</Link>
             <Link :href="route('attendance.index')" class="hover:text-emerald-700 transition">Attendance</Link>
             <Link :href="route('hifz.index')" class="hover:text-emerald-700 transition">Qur'an & Hifz</Link>
+            <Link v-if="!is_teacher_only" :href="route('staff.index')" class="hover:text-emerald-700 transition">Staff & Roles</Link>
             <Link v-if="!is_teacher_only" :href="route('finance.invoices.index')" class="hover:text-emerald-700 transition">Finance</Link>
             <Link v-if="!is_teacher_only" :href="route('reports.index')" class="hover:text-emerald-700 transition">Reports</Link>
           </div>
@@ -204,6 +206,12 @@ const formatCurrency = (minorUnits) => {
           <Link :href="route('students.create')" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow transition">
             + Register Student
           </Link>
+          <Link :href="route('classes.index')" class="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-800 font-bold border border-slate-300 rounded-xl shadow-sm transition">
+            🏫 Manage Classes
+          </Link>
+          <Link :href="route('staff.index')" class="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-800 font-bold border border-slate-300 rounded-xl shadow-sm transition">
+            👥 Staff & Roles
+          </Link>
           <Link :href="route('hifz.fast-entry')" class="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-800 font-bold border border-slate-300 rounded-xl shadow-sm transition">
             📖 Fast Qur'an Entry
           </Link>
@@ -223,13 +231,13 @@ const formatCurrency = (minorUnits) => {
             <div class="text-[11px] text-emerald-600 font-medium mt-1">Enrolled & Active</div>
           </div>
 
-          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <Link :href="route('classes.index')" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-emerald-300 transition block">
             <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active Teachers & Classes</div>
             <div class="text-2xl font-black text-slate-900 mt-2">
               {{ admin_metrics.active_teachers_count }} <span class="text-sm font-normal text-slate-400">/ {{ admin_metrics.active_classes_count }} classes</span>
             </div>
-            <div class="text-[11px] text-slate-400 mt-1">Teaching staff</div>
-          </div>
+            <div class="text-[11px] text-emerald-600 font-bold mt-1">Manage Classes & Staff &rarr;</div>
+          </Link>
 
           <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
             <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Today's Attendance</div>

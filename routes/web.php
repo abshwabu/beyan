@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\Academics\Http\Controllers\AcademicYearController;
+use App\Domain\Academics\Http\Controllers\ClassGroupController;
 use App\Domain\Academics\Http\Controllers\TeacherTimetableController;
 use App\Domain\Attendance\Http\Controllers\AttendanceController;
 use App\Domain\Auth\Http\Controllers\AuthenticatedSessionController;
@@ -11,6 +12,7 @@ use App\Domain\Hifz\Http\Controllers\HifzController;
 use App\Domain\Institution\Http\Controllers\DashboardController;
 use App\Domain\Institution\Http\Controllers\InstitutionRegistrationController;
 use App\Domain\Institution\Http\Controllers\LandingPageController;
+use App\Domain\Institution\Http\Controllers\StaffController;
 use App\Domain\Platform\Http\Controllers\PlatformAnnouncementController;
 use App\Domain\Platform\Http\Controllers\PlatformAuditLogController;
 use App\Domain\Platform\Http\Controllers\PlatformDemoRequestController;
@@ -139,6 +141,21 @@ Route::middleware(['auth', 'tenant'])->group(function () {
 
     // User Invitations
     Route::post('/invitations', [UserInvitationController::class, 'store'])->name('invitations.store');
+
+    // Staff & User Management (for Institution Owners & Admins)
+    Route::prefix('staff')->name('staff.')->group(function () {
+        Route::get('/', [StaffController::class, 'index'])->name('index');
+        Route::post('/', [StaffController::class, 'store'])->name('store');
+        Route::delete('/{id}', [StaffController::class, 'destroy'])->name('destroy');
+    });
+
+    // Classes & Class Groups (for Institution Owners & Admins)
+    Route::prefix('classes')->name('classes.')->group(function () {
+        Route::get('/', [ClassGroupController::class, 'index'])->name('index');
+        Route::post('/', [ClassGroupController::class, 'store'])->name('store');
+        Route::put('/{id}', [ClassGroupController::class, 'update'])->name('update');
+        Route::delete('/{id}', [ClassGroupController::class, 'destroy'])->name('destroy');
+    });
 
     // Academic Years
     Route::prefix('academic-years')->name('academic-years.')->group(function () {
