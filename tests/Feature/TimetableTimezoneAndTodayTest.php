@@ -190,4 +190,21 @@ class TimetableTimezoneAndTodayTest extends TestCase
         $this->assertStringContainsString('attendance', $sessionData['attendance_url']);
         $this->assertEquals('10:00 AM - 11:30 AM', $sessionData['formatted_time_range']);
     }
+
+    public function test_owner_or_admin_can_view_today_timetable_without_teacher_profile(): void
+    {
+        $ownerUser = User::withoutInstitutionScope()->create([
+            'institution_id' => $this->institution->id,
+            'name' => 'Madrasa Owner',
+            'email' => 'owner@beyan.edu.et',
+            'password' => bcrypt('password'),
+            'role' => 'owner',
+        ]);
+        $ownerUser->assignRole('Owner');
+
+        $this->actingAs($ownerUser);
+
+        $response = $this->get(route('timetable.today'));
+        $response->assertOk();
+    }
 }

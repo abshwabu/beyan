@@ -1,10 +1,14 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 
 const props = defineProps({
   teacher: {
     type: Object,
-    required: true,
+    default: null,
+  },
+  teachers: {
+    type: Array,
+    default: () => [],
   },
   today: {
     type: String,
@@ -19,6 +23,10 @@ const props = defineProps({
     required: true,
   },
 });
+
+const onTeacherSelect = (teacherId) => {
+  router.visit(route('timetable.today', { teacher_id: teacherId }));
+};
 
 const getTypeBadgeClass = (type) => {
   switch (type) {
@@ -40,15 +48,36 @@ const getTypeBadgeClass = (type) => {
       <!-- Header -->
       <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Teacher Schedule</span>
-          <h1 class="text-2xl font-bold tracking-tight text-slate-900">{{ teacher.full_name }}</h1>
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Daily Schedule</span>
+            <!-- Teacher Selector for Admins -->
+            <div v-if="teachers && teachers.length > 1" class="flex items-center gap-1.5">
+              <span class="text-xs text-slate-400">• Teacher:</span>
+              <select
+                :value="teacher?.id"
+                @change="onTeacherSelect($event.target.value)"
+                class="text-xs font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1 focus:border-emerald-500 focus:ring-emerald-500"
+              >
+                <option v-for="t in teachers" :key="t.id" :value="t.id">{{ t.full_name }}</option>
+              </select>
+            </div>
+          </div>
+          <h1 class="text-2xl font-bold tracking-tight text-slate-900 mt-1">
+            {{ teacher ? teacher.full_name : 'All Scheduled Classes' }}
+          </h1>
           <p class="text-xs text-slate-500 mt-1">
             Today: <span class="font-medium text-slate-700">{{ today }}</span> • Displaying times in <span class="font-medium text-slate-700">{{ timezone }}</span>
           </p>
         </div>
-        <div class="text-right">
-          <span class="inline-flex items-center rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700">
-            {{ sessions.length }} {{ sessions.length === 1 ? 'Session' : 'Sessions' }} Scheduled Today
+        <div class="flex items-center gap-3">
+          <Link
+            :href="route('dashboard')"
+            class="inline-flex items-center rounded-lg bg-slate-100 hover:bg-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition"
+          >
+            &larr; Dashboard
+          </Link>
+          <span class="inline-flex items-center rounded-lg bg-emerald-50 text-emerald-800 px-3 py-1.5 text-xs font-bold">
+            {{ sessions.length }} {{ sessions.length === 1 ? 'Session' : 'Sessions' }} Today
           </span>
         </div>
       </div>
@@ -116,11 +145,21 @@ const getTypeBadgeClass = (type) => {
         v-else
         class="bg-white p-12 text-center rounded-2xl shadow-sm border border-slate-200 space-y-3"
       >
-        <div class="text-4xl">🎉</div>
-        <h3 class="text-base font-bold text-slate-900">No Sessions Scheduled For Today</h3>
+        <div class="text-4xl">📅</div>
+        <h3 class="text-base font-bold text-slate-900">
+          {{ teacher ? 'No Sessions Scheduled For Today' : 'No Active Teachers or Sessions Found' }}
+        </h3>
         <p class="text-xs text-slate-500 max-w-sm mx-auto">
-          You have no active teaching sessions scheduled for today. Enjoy your preparation time or check upcoming days.
+          {{ teacher ? 'There are no active teaching sessions scheduled for today.' : 'No active teacher profiles or scheduled sessions were found for today.' }}
         </p>
+        <div class="pt-2">
+          <Link
+            :href="route('dashboard')"
+            class="inline-flex items-center px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-sm"
+          >
+            Return to Dashboard
+          </Link>
+        </div>
       </div>
     </div>
   </div>

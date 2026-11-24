@@ -23,19 +23,57 @@ class TeacherTimetableController extends Controller
         // Resolve teacher record
         $teacher = Teacher::where('user_id', $user->id)->first();
 
-        // If user is admin/owner, allow viewing any teacher's today schedule via ?teacher_id=
-        if (! $teacher && $request->filled('teacher_id') && ($user->isOwner() || $user->hasRole('Admin') || $user->isPlatformSuperAdmin())) {
-            $teacher = Teacher::findOrFail($request->input('teacher_id'));
-        }
+        $isStaff = $user->isOwner()
+            || $user->hasRole('Admin')
+            || $user->hasRole('Owner')
+            || $user->isPlatformSuperAdmin()
+            || $user->isPlatformStaff();
 
-        if (! $teacher) {
-            abort(403, 'No teacher profile linked to your user account.');
+        $teachers = [];
+        if ($isStaff) {
+            $teachers = Teacher::where('status', 'active')
+                ->orderBy('full_name')
+                ->get();
+
+            if (! $teacher) {
+                if ($request->filled('teacher_id')) {
+                    $teacher = Teacher::find($request->input('teacher_id'));
+                } else {
+                    // Default to first active teacher in the institution so admins can view schedule immediately
+                    $teacher = $teachers->first();
+                }
+            }
         }
 
         $viewerTimezone = $request->input('timezone')
             ?: ($user->institution->timezone ?? 'UTC');
 
         $todayLocal = Carbon::now($viewerTimezone)->format('Y-m-d');
+
+        if (! $teacher) {
+            if ($isStaff) {
+                // If the institution has no teachers yet, show empty state gracefully instead of 403
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'teacher' => null,
+                        'teachers' => $teachers,
+                        'today' => $todayLocal,
+                        'timezone' => $viewerTimezone,
+                        'sessions' => [],
+                    ]);
+                }
+
+                return Inertia::render('Timetable/Today', [
+                    'teacher' => null,
+                    'teachers' => $teachers,
+                    'today' => $todayLocal,
+                    'timezone' => $viewerTimezone,
+                    'sessions' => [],
+                ]);
+            }
+
+            abort(403, 'No teacher profile linked to your user account.');
+        }
 
         $sessions = ClassSession::with(['classGroup.course', 'classGroup.activeEnrollments'])
             ->where('teacher_id', $teacher->id)
@@ -56,6 +94,7 @@ class TeacherTimetableController extends Controller
         if ($request->wantsJson()) {
             return response()->json([
                 'teacher' => $teacher,
+                'teachers' => $teachers,
                 'today' => $todayLocal,
                 'timezone' => $viewerTimezone,
                 'sessions' => $sessions,
@@ -64,6 +103,7 @@ class TeacherTimetableController extends Controller
 
         return Inertia::render('Timetable/Today', [
             'teacher' => $teacher,
+            'teachers' => $teachers,
             'today' => $todayLocal,
             'timezone' => $viewerTimezone,
             'sessions' => $sessions,
