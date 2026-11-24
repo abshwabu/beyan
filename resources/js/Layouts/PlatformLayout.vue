@@ -1,10 +1,25 @@
 <script setup>
-import { computed } from 'vue';
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
+import { Head, Link, usePage, router } from '@inertiajs/vue3';
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user);
 const flash = computed(() => page.props.flash || {});
+const langMenuOpen = ref(false);
+const currentLocale = computed(() => page.props.i18n?.locale || 'en');
+const supportedLocales = computed(() => page.props.i18n?.supportedLocales || [
+    { code: 'en', name: 'English', native: 'English', dir: 'ltr' },
+    { code: 'am', name: 'Amharic', native: 'አማርኛ', dir: 'ltr' },
+    { code: 'om', name: 'Afaan Oromoo', native: 'Afaan Oromoo', dir: 'ltr' },
+    { code: 'ar', name: 'Arabic', native: 'العربية', dir: 'rtl' },
+]);
+
+const switchLocale = (code) => {
+    langMenuOpen.value = false;
+    router.visit(`/locale/${code}`, {
+        preserveScroll: true,
+    });
+};
 
 defineProps({
     title: {
@@ -53,6 +68,39 @@ const isCurrent = (path) => {
 
                     <!-- Right: User & Exit -->
                     <div class="flex items-center gap-4 text-xs">
+                        <!-- Language Switcher -->
+                        <div class="relative">
+                            <button
+                                type="button"
+                                @click="langMenuOpen = !langMenuOpen"
+                                class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold transition"
+                                title="Change Interface Language"
+                            >
+                                <span>🌐</span>
+                                <span class="uppercase tracking-wider text-[11px]">{{ currentLocale }}</span>
+                                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            <div
+                                v-if="langMenuOpen"
+                                class="absolute end-0 mt-1.5 w-40 bg-slate-900 border border-slate-700 rounded-xl shadow-xl py-1 z-50 text-xs"
+                            >
+                                <button
+                                    v-for="l in supportedLocales"
+                                    :key="l.code"
+                                    type="button"
+                                    @click="switchLocale(l.code)"
+                                    class="w-full flex items-center justify-between px-3 py-2 text-start hover:bg-slate-800 transition"
+                                    :class="currentLocale === l.code ? 'font-bold text-rose-400 bg-slate-800/80' : 'text-slate-300'"
+                                >
+                                    <span>{{ l.native }}</span>
+                                    <span class="text-[10px] text-slate-500 uppercase font-mono">{{ l.code }}</span>
+                                </button>
+                            </div>
+                        </div>
+
                         <span class="text-slate-300 font-medium hidden sm:inline">{{ user?.name }} ({{ user?.email }})</span>
                         <Link
                             href="/logout"

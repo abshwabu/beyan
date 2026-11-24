@@ -192,7 +192,7 @@ class DemoInstitutionsSeeder extends Seeder
                 'mode' => 'online',
                 'timezone' => 'Africa/Addis_Ababa',
                 'currency' => 'ETB',
-                'locale' => 'ar',
+                'locale' => 'en',
                 'status' => 'active',
                 'subscription_plan' => 'standard',
                 'subscription_ends_at' => Carbon::now()->addYear(),

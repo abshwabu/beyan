@@ -50,7 +50,7 @@ class ResolveTenantInstitution
             // Sync Spatie team context with current tenant
             app(PermissionRegistrar::class)->setPermissionsTeamId($institution->id);
 
-            if ($institution->locale && in_array($institution->locale, ['en', 'am', 'om', 'ar'], true)) {
+            if (! $request->session()->has('locale') && $institution->locale && in_array($institution->locale, ['en', 'am', 'om', 'ar'], true)) {
                 app()->setLocale($institution->locale);
             }
 

@@ -1,6 +1,6 @@
 import './bootstrap';
 import { createApp, h } from 'vue';
-import { createInertiaApp } from '@inertiajs/vue3';
+import { createInertiaApp, router } from '@inertiajs/vue3';
 
 const safeRoute = (...args) => {
     if (typeof window !== 'undefined' && typeof window.route === 'function') {
@@ -8,6 +8,17 @@ const safeRoute = (...args) => {
     }
     return '#';
 };
+
+// Synchronize document <html> dir and lang attributes on every page navigation
+if (typeof document !== 'undefined') {
+    router.on('navigate', (event) => {
+        const page = event.detail.page;
+        const direction = page.props.i18n?.direction || 'ltr';
+        const locale = page.props.i18n?.locale || 'en';
+        document.documentElement.setAttribute('dir', direction);
+        document.documentElement.setAttribute('lang', locale);
+    });
+}
 
 createInertiaApp({
     title: (title) => title ? `${title} - Beyan Madrasa` : 'Beyan Madrasa Management',

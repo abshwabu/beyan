@@ -130,6 +130,12 @@ class HandleInertiaRequests extends Middleware
                 'locale' => $locale,
                 'direction' => DirectionHelper::forLocale($locale),
                 'translations' => trans('app') ?: [],
+                'supportedLocales' => [
+                    ['code' => 'en', 'name' => 'English', 'native' => 'English', 'dir' => 'ltr'],
+                    ['code' => 'am', 'name' => 'Amharic', 'native' => 'አማርኛ', 'dir' => 'ltr'],
+                    ['code' => 'om', 'name' => 'Afaan Oromoo', 'native' => 'Afaan Oromoo', 'dir' => 'ltr'],
+                    ['code' => 'ar', 'name' => 'Arabic', 'native' => 'العربية', 'dir' => 'rtl'],
+                ],
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),

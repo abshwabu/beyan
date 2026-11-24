@@ -82,6 +82,29 @@ class I18nAndRtlTest extends TestCase
         $this->assertEquals('rtl', DirectionHelper::forLocale(), 'Direction for Arabic institution must be RTL.');
     }
 
+    public function test_user_session_locale_overrides_institution_default_locale(): void
+    {
+        $institutionAr = Institution::factory()->create([
+            'locale' => 'ar',
+            'status' => 'active',
+        ]);
+
+        $userAr = User::withoutInstitutionScope()->create([
+            'institution_id' => $institutionAr->id,
+            'name' => 'Arabic Ustadh',
+            'email' => 'ustadh2@arabic.edu.et',
+            'password' => bcrypt('password'),
+            'role' => 'owner',
+        ]);
+
+        $this->actingAs($userAr)
+            ->withSession(['locale' => 'en'])
+            ->get(route('dashboard'));
+
+        $this->assertEquals('en', app()->getLocale(), 'User session locale must override institution default locale.');
+        $this->assertEquals('ltr', DirectionHelper::forLocale(), 'Direction for English session must be LTR.');
+    }
+
     public function test_utc_dates_are_converted_to_institution_timezone(): void
     {
         // 12:00:00 UTC corresponds to 15:00:00 (3:00 PM) in Africa/Addis_Ababa (UTC+3)
