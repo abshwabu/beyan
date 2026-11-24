@@ -6,5 +6,8 @@ use App\Domain\Auth\Models\User as DomainUser;
 
 class User extends DomainUser
 {
-    // Inherits all domain user capabilities, relationships, and tenancy scopes
+    public function getMorphClass()
+    {
+        return DomainUser::class;
+    }
 }
