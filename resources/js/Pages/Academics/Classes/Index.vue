@@ -25,6 +25,37 @@ const props = defineProps({
 const showCreateModal = ref(false);
 const editingClass = ref(null);
 
+// Weekday definitions (0=Sunday .. 6=Saturday matching Carbon/PHP dayOfWeek)
+const weekdays = [
+  { value: 0, short: 'Sun', label: 'Sunday' },
+  { value: 1, short: 'Mon', label: 'Monday' },
+  { value: 2, short: 'Tue', label: 'Tuesday' },
+  { value: 3, short: 'Wed', label: 'Wednesday' },
+  { value: 4, short: 'Thu', label: 'Thursday' },
+  { value: 5, short: 'Fri', label: 'Friday' },
+  { value: 6, short: 'Sat', label: 'Saturday' },
+];
+
+const toggleDay = (form, dayValue) => {
+  const idx = form.schedule_days.indexOf(dayValue);
+  if (idx > -1) {
+    form.schedule_days.splice(idx, 1);
+  } else {
+    form.schedule_days.push(dayValue);
+    form.schedule_days.sort((a, b) => a - b);
+  }
+};
+
+const formatScheduleSummary = (schedules) => {
+  if (!schedules || schedules.length === 0) return null;
+  const days = schedules
+    .map((s) => weekdays.find((w) => w.value === s.weekday)?.short)
+    .filter(Boolean)
+    .join(', ');
+  const first = schedules[0];
+  return `${days} · ${first.start_time} – ${first.end_time}`;
+};
+
 // Forms
 const createForm = useForm({
   name: '',
@@ -35,6 +66,9 @@ const createForm = useForm({
   capacity: 20,
   room: '',
   meeting_link: '',
+  schedule_days: [1, 3, 5],
+  start_time: '08:00',
+  end_time: '09:30',
 });
 
 const editForm = useForm({
@@ -48,6 +82,9 @@ const editForm = useForm({
   room: '',
   meeting_link: '',
   status: 'active',
+  schedule_days: [],
+  start_time: '',
+  end_time: '',
 });
 
 const openEditModal = (c) => {
@@ -62,6 +99,10 @@ const openEditModal = (c) => {
   editForm.room = c.room || '';
   editForm.meeting_link = c.meeting_link || '';
   editForm.status = c.status || 'active';
+  editForm.schedule_days = (c.schedules || []).map((s) => s.weekday);
+  editForm.start_time = c.schedules?.[0]?.start_time || '';
+  editForm.end_time = c.schedules?.[0]?.end_time || '';
+  editForm.clearErrors();
 };
 
 const submitCreate = () => {
@@ -278,6 +319,14 @@ const getTypeBadge = (type) => {
               <span class="font-bold text-slate-800">{{ c.primary_teacher?.name || 'Unassigned' }}</span>
             </div>
 
+            <div class="flex items-center gap-2">
+              <span class="text-slate-400">🕒 Time:</span>
+              <span v-if="formatScheduleSummary(c.schedules)" class="font-bold text-emerald-700">
+                {{ formatScheduleSummary(c.schedules) }}
+              </span>
+              <span v-else class="text-slate-400 italic">No schedule set</span>
+            </div>
+
             <div v-if="c.room" class="flex items-center gap-2">
               <span class="text-slate-400">📍 Room:</span>
               <span class="font-medium text-slate-700">{{ c.room }}</span>
@@ -463,6 +512,81 @@ const getTypeBadge = (type) => {
             />
           </div>
 
+          <!-- Class Schedule & Time -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/90 space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="block font-bold text-slate-800">Class Days & Time</label>
+              <div class="flex items-center gap-1.5 text-[10px]">
+                <button
+                  type="button"
+                  @click="createForm.schedule_days = [0, 1, 2, 3, 4, 5, 6]"
+                  class="px-2 py-0.5 rounded-md bg-white border border-slate-200 font-semibold text-slate-600 hover:bg-slate-100"
+                >
+                  Daily
+                </button>
+                <button
+                  type="button"
+                  @click="createForm.schedule_days = [1, 2, 3, 4, 5]"
+                  class="px-2 py-0.5 rounded-md bg-white border border-slate-200 font-semibold text-slate-600 hover:bg-slate-100"
+                >
+                  Mon–Fri
+                </button>
+                <button
+                  type="button"
+                  @click="createForm.schedule_days = []"
+                  class="px-2 py-0.5 rounded-md bg-white border border-slate-200 font-semibold text-slate-500 hover:bg-slate-100"
+                >
+                  Clear
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-7 gap-1.5">
+              <button
+                v-for="day in weekdays"
+                :key="day.value"
+                type="button"
+                @click="toggleDay(createForm, day.value)"
+                :class="[
+                  'py-1.5 rounded-lg text-[11px] font-bold border transition-all active:scale-[0.97]',
+                  createForm.schedule_days.includes(day.value)
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
+                ]"
+              >
+                {{ day.short }}
+              </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Start Time</label>
+                <input
+                  v-model="createForm.start_time"
+                  type="time"
+                  :required="createForm.schedule_days.length > 0"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white font-mono font-semibold focus:ring-emerald-500 focus:border-emerald-500"
+                />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">End Time</label>
+                <input
+                  v-model="createForm.end_time"
+                  type="time"
+                  :required="createForm.schedule_days.length > 0"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white font-mono font-semibold focus:ring-emerald-500 focus:border-emerald-500"
+                />
+              </div>
+            </div>
+
+            <div v-if="createForm.errors.start_time" class="text-rose-600 text-[11px] font-semibold">
+              {{ createForm.errors.start_time }}
+            </div>
+            <div v-if="createForm.errors.end_time" class="text-rose-600 text-[11px] font-semibold">
+              {{ createForm.errors.end_time }}
+            </div>
+          </div>
+
           <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
             <button
               type="button"
@@ -586,6 +710,81 @@ const getTypeBadge = (type) => {
               type="url"
               class="w-full px-3 py-2 border border-slate-300 rounded-xl"
             />
+          </div>
+
+          <!-- Class Schedule & Time -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/90 space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="block font-bold text-slate-800">Class Days & Time</label>
+              <div class="flex items-center gap-1.5 text-[10px]">
+                <button
+                  type="button"
+                  @click="editForm.schedule_days = [0, 1, 2, 3, 4, 5, 6]"
+                  class="px-2 py-0.5 rounded-md bg-white border border-slate-200 font-semibold text-slate-600 hover:bg-slate-100"
+                >
+                  Daily
+                </button>
+                <button
+                  type="button"
+                  @click="editForm.schedule_days = [1, 2, 3, 4, 5]"
+                  class="px-2 py-0.5 rounded-md bg-white border border-slate-200 font-semibold text-slate-600 hover:bg-slate-100"
+                >
+                  Mon–Fri
+                </button>
+                <button
+                  type="button"
+                  @click="editForm.schedule_days = []"
+                  class="px-2 py-0.5 rounded-md bg-white border border-slate-200 font-semibold text-slate-500 hover:bg-slate-100"
+                >
+                  Clear
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-7 gap-1.5">
+              <button
+                v-for="day in weekdays"
+                :key="day.value"
+                type="button"
+                @click="toggleDay(editForm, day.value)"
+                :class="[
+                  'py-1.5 rounded-lg text-[11px] font-bold border transition-all active:scale-[0.97]',
+                  editForm.schedule_days.includes(day.value)
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
+                ]"
+              >
+                {{ day.short }}
+              </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Start Time</label>
+                <input
+                  v-model="editForm.start_time"
+                  type="time"
+                  :required="editForm.schedule_days.length > 0"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white font-mono font-semibold focus:ring-emerald-500 focus:border-emerald-500"
+                />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">End Time</label>
+                <input
+                  v-model="editForm.end_time"
+                  type="time"
+                  :required="editForm.schedule_days.length > 0"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white font-mono font-semibold focus:ring-emerald-500 focus:border-emerald-500"
+                />
+              </div>
+            </div>
+
+            <div v-if="editForm.errors.start_time" class="text-rose-600 text-[11px] font-semibold">
+              {{ editForm.errors.start_time }}
+            </div>
+            <div v-if="editForm.errors.end_time" class="text-rose-600 text-[11px] font-semibold">
+              {{ editForm.errors.end_time }}
+            </div>
           </div>
 
           <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
