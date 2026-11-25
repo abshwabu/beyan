@@ -1,5 +1,7 @@
 <script setup>
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
+
+const page = usePage();
 
 const props = defineProps({
   entries: {
@@ -22,6 +24,22 @@ const filterByType = (type) => {
 
   <div class="min-h-screen bg-slate-50/70 py-8 px-4 sm:px-6 lg:px-8" dir="ltr">
     <div class="max-w-6xl mx-auto space-y-6">
+      <!-- Flash Notification -->
+      <div
+        v-if="page.props.flash?.success"
+        class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200/90 text-emerald-800 text-xs font-bold flex items-center gap-2 shadow-xs"
+      >
+        <span>✓</span>
+        <span>{{ page.props.flash.success }}</span>
+      </div>
+      <div
+        v-if="page.props.flash?.error"
+        class="p-4 rounded-2xl bg-rose-50 border border-rose-200/90 text-rose-800 text-xs font-bold flex items-center gap-2 shadow-xs"
+      >
+        <span>✕</span>
+        <span>{{ page.props.flash.error }}</span>
+      </div>
+
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200/90">
         <div>
           <nav class="flex items-center gap-2 text-xs font-medium text-slate-500 mb-1.5">

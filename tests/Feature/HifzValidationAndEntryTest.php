@@ -278,7 +278,8 @@ class HifzValidationAndEntryTest extends TestCase
             'mistakes_count' => 0,
         ]);
 
-        $response->assertRedirect();
+        $response->assertRedirect(route('hifz.index'));
+        $response->assertSessionHas('success', 'Hifz entry recorded successfully.');
         $this->assertDatabaseHas('hifz_entries', [
             'student_id' => $this->student->id,
             'surah_number' => 1,

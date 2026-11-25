@@ -196,7 +196,7 @@ class HifzController extends Controller
             ], 201);
         }
 
-        return redirect()->back()->with('success', 'Hifz entry recorded successfully.');
+        return redirect()->route('hifz.index')->with('success', 'Hifz entry recorded successfully.');
     }
 
     /**
