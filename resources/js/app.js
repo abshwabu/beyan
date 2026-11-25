@@ -1,6 +1,7 @@
 import './bootstrap';
 import { createApp, h } from 'vue';
 import { createInertiaApp, router } from '@inertiajs/vue3';
+import TenantLayout from './Layouts/TenantLayout.vue';
 
 const safeRoute = (...args) => {
     if (typeof window !== 'undefined' && typeof window.route === 'function') {
@@ -26,7 +27,19 @@ createInertiaApp({
     title: (title) => title ? `${title} - Beyan Madrasa` : 'Beyan Madrasa Management',
     resolve: (name) => {
         const pages = import.meta.glob('./Pages/**/*.vue', { eager: true });
-        return pages[`./Pages/${name}.vue`];
+        const page = pages[`./Pages/${name}.vue`];
+
+        const isPublicOrPlatform =
+            name === 'Landing' ||
+            name.startsWith('Auth/') ||
+            name.startsWith('Platform/') ||
+            name.startsWith('Legal/');
+
+        if (page && page.default && !isPublicOrPlatform && page.default.layout === undefined) {
+            page.default.layout = TenantLayout;
+        }
+
+        return page;
     },
     setup({ el, App, props, plugin }) {
         const vueApp = createApp({ render: () => h(App, props) });

@@ -1,7 +1,6 @@
 <script setup>
 import { computed } from 'vue';
 import { usePage, Link, Head } from '@inertiajs/vue3';
-import TenantLayout from '@/Layouts/TenantLayout.vue';
 
 const props = defineProps({
   institution: Object,
@@ -26,9 +25,8 @@ const formatCurrency = (minorUnits) => {
 <template>
   <Head title="Dashboard - Beyan" />
 
-  <TenantLayout :institution="institution" :is-teacher-only="is_teacher_only">
-    <!-- Main Workspace Content -->
-    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
+  <!-- Main Workspace Content -->
+  <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
       <!-- Flash Notification -->
       <div v-if="page.props.flash?.success" class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium">
         ✓ {{ page.props.flash.success }}
@@ -260,6 +258,5 @@ const formatCurrency = (minorUnits) => {
           </div>
         </div>
       </div>
-    </div>
-  </TenantLayout>
+  </div>
 </template>

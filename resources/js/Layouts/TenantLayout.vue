@@ -22,6 +22,18 @@ const teacherOnly = computed(() => {
 });
 
 const mobileMenuOpen = ref(false);
+const desktopSidebarOpen = ref(
+  typeof window !== 'undefined'
+    ? window.localStorage.getItem('beyan_sidebar_open') !== 'false'
+    : true
+);
+
+const toggleDesktopSidebar = () => {
+  desktopSidebarOpen.value = !desktopSidebarOpen.value;
+  if (typeof window !== 'undefined') {
+    window.localStorage.setItem('beyan_sidebar_open', String(desktopSidebarOpen.value));
+  }
+};
 
 const isCurrent = (path) => {
   const url = page.url || '';
@@ -97,8 +109,9 @@ const isItemActive = (item) => {
     <!-- Sidebar (Fixed on Desktop, Slide-over on Mobile) -->
     <aside
       :class="[
-        'fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col transition-transform duration-200 ease-in-out lg:translate-x-0',
-        mobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+        'fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col transition-transform duration-200 ease-in-out',
+        mobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full',
+        desktopSidebarOpen ? 'lg:translate-x-0' : 'lg:-translate-x-full'
       ]"
     >
       <!-- Brand Header -->
@@ -117,6 +130,7 @@ const isItemActive = (item) => {
           </div>
         </Link>
 
+        <!-- Mobile Close Button -->
         <button
           type="button"
           @click="mobileMenuOpen = false"
@@ -124,6 +138,19 @@ const isItemActive = (item) => {
           aria-label="Close menu"
         >
           ✕
+        </button>
+
+        <!-- Desktop Collapse/Close Button -->
+        <button
+          type="button"
+          @click="toggleDesktopSidebar"
+          title="Collapse sidebar"
+          class="hidden lg:inline-flex items-center justify-center p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition"
+          aria-label="Collapse sidebar"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+          </svg>
         </button>
       </div>
 
@@ -171,7 +198,25 @@ const isItemActive = (item) => {
     </aside>
 
     <!-- Main Column -->
-    <div class="flex-1 flex flex-col min-w-0 lg:pl-64">
+    <div
+      :class="[
+        'flex-1 flex flex-col min-w-0 transition-all duration-200 ease-in-out',
+        desktopSidebarOpen ? 'lg:pl-64' : 'lg:pl-0'
+      ]"
+    >
+      <!-- Desktop Floating Open-Sidebar Button (only visible when collapsed) -->
+      <button
+        v-if="!desktopSidebarOpen"
+        type="button"
+        @click="toggleDesktopSidebar"
+        title="Open sidebar"
+        class="hidden lg:inline-flex items-center gap-1.5 fixed top-4 left-4 z-40 px-3 py-2 rounded-xl bg-white border border-slate-200 shadow-md text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-emerald-700 transition"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <span>Menu</span>
+      </button>
       <!-- Impersonation Banner -->
       <div v-if="$page.props.impersonation?.active" class="bg-amber-400 text-slate-900 px-4 py-2.5 font-bold text-xs sm:text-sm shadow-md flex flex-wrap items-center justify-between gap-2 border-b border-amber-500">
         <div class="flex items-center gap-2">
