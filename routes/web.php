@@ -2,6 +2,7 @@
 
 use App\Domain\Academics\Http\Controllers\AcademicYearController;
 use App\Domain\Academics\Http\Controllers\ClassGroupController;
+use App\Domain\Academics\Http\Controllers\CourseController;
 use App\Domain\Academics\Http\Controllers\TeacherTimetableController;
 use App\Domain\Attendance\Http\Controllers\AttendanceController;
 use App\Domain\Auth\Http\Controllers\AuthenticatedSessionController;
@@ -155,6 +156,14 @@ Route::middleware(['auth', 'tenant'])->group(function () {
         Route::post('/', [ClassGroupController::class, 'store'])->name('store');
         Route::put('/{id}', [ClassGroupController::class, 'update'])->name('update');
         Route::delete('/{id}', [ClassGroupController::class, 'destroy'])->name('destroy');
+    });
+
+    // Courses & Curriculum (for Institution Owners & Admins)
+    Route::prefix('courses')->name('courses.')->group(function () {
+        Route::get('/', [CourseController::class, 'index'])->name('index');
+        Route::post('/', [CourseController::class, 'store'])->name('store');
+        Route::put('/{id}', [CourseController::class, 'update'])->name('update');
+        Route::delete('/{id}', [CourseController::class, 'destroy'])->name('destroy');
     });
 
     // Academic Years

@@ -63,6 +63,7 @@ const formatCurrency = (minorUnits) => {
           <!-- Main Nav Links -->
           <div class="hidden md:flex items-center space-x-4 text-xs font-bold text-slate-600">
             <Link :href="route('students.index')" class="hover:text-emerald-700 transition">Students</Link>
+            <Link v-if="!is_teacher_only" :href="route('courses.index')" class="hover:text-emerald-700 transition">Courses</Link>
             <Link v-if="!is_teacher_only" :href="route('classes.index')" class="hover:text-emerald-700 transition">Classes</Link>
             <Link :href="route('timetable.today')" class="hover:text-emerald-700 transition">Timetable</Link>
             <Link :href="route('attendance.index')" class="hover:text-emerald-700 transition">Attendance</Link>
@@ -205,6 +206,9 @@ const formatCurrency = (minorUnits) => {
         <div class="flex flex-wrap gap-2 text-xs">
           <Link :href="route('students.create')" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow transition">
             + Register Student
+          </Link>
+          <Link :href="route('courses.index')" class="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-800 font-bold border border-slate-300 rounded-xl shadow-sm transition">
+            📚 Courses
           </Link>
           <Link :href="route('classes.index')" class="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-800 font-bold border border-slate-300 rounded-xl shadow-sm transition">
             🏫 Manage Classes
