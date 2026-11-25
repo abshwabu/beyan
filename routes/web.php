@@ -150,6 +150,12 @@ Route::middleware(['auth', 'tenant'])->group(function () {
         Route::delete('/{id}', [StaffController::class, 'destroy'])->name('destroy');
     });
 
+    // Fast Qur'an Entry direct shortcuts (supports /fast-entry, /fast-entery, /fast_entry, /fastentry)
+    Route::get('/fast-entry', [HifzController::class, 'fastEntry'])->name('fast-entry');
+    Route::get('/fast-entery', [HifzController::class, 'fastEntry']);
+    Route::get('/fast_entry', [HifzController::class, 'fastEntry']);
+    Route::get('/fastentry', [HifzController::class, 'fastEntry']);
+
     // Classes & Class Groups (for Institution Owners & Admins)
     Route::prefix('classes')->name('classes.')->group(function () {
         Route::get('/', [ClassGroupController::class, 'index'])->name('index');
@@ -230,6 +236,9 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::prefix('hifz')->name('hifz.')->group(function () {
         Route::get('/', [HifzController::class, 'index'])->name('index');
         Route::get('/fast-entry', [HifzController::class, 'fastEntry'])->name('fast-entry');
+        Route::get('/fast-entery', [HifzController::class, 'fastEntry']);
+        Route::get('/fast_entry', [HifzController::class, 'fastEntry']);
+        Route::get('/fastentry', [HifzController::class, 'fastEntry']);
         Route::post('/entries', [HifzController::class, 'store'])->name('entries.store');
         Route::get('/students/{student}', [HifzController::class, 'studentProfile'])->name('student.profile');
         Route::post('/students/{student}/targets', [HifzController::class, 'storeTarget'])->name('student.targets.store');

@@ -243,4 +243,46 @@ class HifzValidationAndEntryTest extends TestCase
         $response->assertJsonPath('last_sabaq.end_ayah', 15);
         $response->assertJsonPath('last_sabaq.suggested_start_ayah', 16);
     }
+
+    public function test_fast_entry_shortcut_routes_accessible(): void
+    {
+        $this->actingAs($this->teacherUser);
+
+        $this->get('/fast-entry')->assertOk();
+        $this->get('/fast-entery')->assertOk();
+        $this->get('/fast_entry')->assertOk();
+    }
+
+    public function test_owner_without_teacher_profile_can_record_entry(): void
+    {
+        $owner = User::create([
+            'institution_id' => $this->institution->id,
+            'name' => 'Madrasa Owner',
+            'email' => 'owner@beyan.edu.et',
+            'role' => 'owner',
+            'password' => bcrypt('password'),
+        ]);
+        $owner->assignRole('Owner');
+
+        $this->actingAs($owner);
+
+        $response = $this->post(route('hifz.entries.store'), [
+            'student_id' => $this->student->id,
+            'date' => '2026-11-25',
+            'type' => 'sabaq',
+            'surah_number' => 1,
+            'start_ayah' => 1,
+            'end_ayah' => 7,
+            'quality_rating' => 'excellent',
+            'tajweed_rating' => 'excellent',
+            'mistakes_count' => 0,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('hifz_entries', [
+            'student_id' => $this->student->id,
+            'surah_number' => 1,
+            'type' => 'sabaq',
+        ]);
+    }
 }

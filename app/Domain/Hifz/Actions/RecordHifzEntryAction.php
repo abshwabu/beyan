@@ -55,8 +55,27 @@ class RecordHifzEntryAction
         // Validate student exists
         $student = Student::query()->findOrFail($data['student_id']);
 
-        // Validate teacher exists
-        $teacher = Teacher::query()->findOrFail($data['teacher_id']);
+        // Validate teacher exists (fallback to first institution teacher or auto-create)
+        $teacherId = $data['teacher_id'] ?? null;
+        if (! $teacherId) {
+            $teacher = Teacher::firstOrCreate(
+                [
+                    'institution_id' => $student->institution_id,
+                    'full_name' => 'Academic Instructor',
+                ],
+                ['status' => 'active']
+            );
+        } else {
+            $teacher = Teacher::query()->find($teacherId)
+                ?? Teacher::where('institution_id', $student->institution_id)->first()
+                ?? Teacher::firstOrCreate(
+                    [
+                        'institution_id' => $student->institution_id,
+                        'full_name' => 'Academic Instructor',
+                    ],
+                    ['status' => 'active']
+                );
+        }
 
         return DB::transaction(function () use ($data, $student, $teacher, $surah) {
             return HifzEntry::create([

@@ -164,10 +164,22 @@ class HifzController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        // Resolve teacher id if not provided
+        // Resolve teacher id if not provided (fallback to user teacher profile, or auto-link for admin/owner)
         if (empty($validated['teacher_id'])) {
-            $teacher = $user->teacherProfile ?? Teacher::where('user_id', $user->id)->first();
-            $validated['teacher_id'] = $teacher?->id;
+            $teacher = $user->teacherProfile
+                ?? Teacher::where('user_id', $user->id)->first()
+                ?? Teacher::firstOrCreate(
+                    [
+                        'institution_id' => $user->institution_id,
+                        'user_id' => $user->id,
+                    ],
+                    [
+                        'full_name' => $user->name,
+                        'specialization' => 'Qur\'an Instructor',
+                        'status' => 'active',
+                    ]
+                );
+            $validated['teacher_id'] = $teacher->id;
         }
 
         // Check policy on student
