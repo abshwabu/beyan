@@ -22,7 +22,7 @@ class ReportGeneratorService
     {
         $query = Student::query()
             ->where('institution_id', $institution->id)
-            ->with(['currentEnrollment.classGroup', 'guardians'])
+            ->with(['currentEnrollment', 'classGroups', 'guardians'])
             ->orderBy('full_name');
 
         if (! empty($filters['status'])) {
@@ -34,8 +34,8 @@ class ReportGeneratorService
         }
 
         if (! empty($filters['class_group_id'])) {
-            $query->whereHas('currentEnrollment', function ($q) use ($filters) {
-                $q->where('class_group_id', $filters['class_group_id']);
+            $query->whereHas('classGroups', function ($q) use ($filters) {
+                $q->where('class_groups.id', $filters['class_group_id']);
             });
         }
 
@@ -45,7 +45,7 @@ class ReportGeneratorService
             'gender' => ucfirst($s->gender ?: 'N/A'),
             'date_of_birth' => $s->date_of_birth?->toDateString() ?: 'N/A',
             'admission_date' => $s->admission_date?->toDateString() ?: 'N/A',
-            'class_group' => $s->currentEnrollment?->classGroup?->name ?: 'Unassigned',
+            'class_group' => $s->classGroups->first()?->name ?: ($s->currentEnrollment?->class_name ?: 'Unassigned'),
             'guardian_contact' => $s->primaryGuardian()?->phone ?: 'N/A',
             'status' => ucfirst($s->status),
         ])->all();

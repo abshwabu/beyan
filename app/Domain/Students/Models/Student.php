@@ -2,6 +2,7 @@
 
 namespace App\Domain\Students\Models;
 
+use App\Domain\Academics\Models\ClassGroup;
 use App\Domain\Attendance\Models\AttendanceRecord;
 use App\Domain\Auth\Models\User;
 use App\Domain\Finance\Models\FeeInvoice;
@@ -131,6 +132,15 @@ class Student extends Model
         return $this->hasOne(StudentEnrollment::class, 'student_id')
             ->whereNull('end_date')
             ->where('status', 'current');
+    }
+
+    public function classGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(ClassGroup::class, 'class_enrollments', 'student_id', 'class_group_id')
+            ->wherePivot('status', 'enrolled')
+            ->wherePivotNull('end_date')
+            ->withPivot(['start_date', 'end_date', 'status', 'notes', 'institution_id'])
+            ->withTimestamps();
     }
 
     public function statusHistories(): HasMany
