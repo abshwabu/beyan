@@ -3,6 +3,7 @@
 namespace App\Domain\Reports\Http\Controllers;
 
 use App\Domain\Institution\Models\Institution;
+use App\Domain\Institution\Tenancy\TenantManager;
 use App\Domain\Reports\Services\ReportExportService;
 use App\Domain\Reports\Services\ReportGeneratorService;
 use App\Http\Controllers\Controller;
@@ -78,8 +79,7 @@ class ReportController extends Controller
     {
         $this->authorizeReportsAccess();
 
-        /** @var Institution $institution */
-        $institution = $request->user()->institution;
+        $institution = $this->resolveInstitution($request);
 
         $report = $this->buildReportData($institution, $type, $request->all());
 
@@ -101,8 +101,7 @@ class ReportController extends Controller
     {
         $this->authorizeReportsAccess();
 
-        /** @var Institution $institution */
-        $institution = $request->user()->institution;
+        $institution = $this->resolveInstitution($request);
 
         $report = $this->buildReportData($institution, $type, $request->all());
         $format = $request->input('format', 'csv');
@@ -121,6 +120,17 @@ class ReportController extends Controller
             $report['headers'],
             $report['rows']
         );
+    }
+
+    protected function resolveInstitution(Request $request): Institution
+    {
+        $institution = app(TenantManager::class)->getTenant() ?? $request->user()?->institution;
+
+        if (! $institution) {
+            abort(403, 'No active institution context found.');
+        }
+
+        return $institution;
     }
 
     /**
