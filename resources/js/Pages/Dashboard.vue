@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue';
-import { usePage, Link } from '@inertiajs/vue3';
+import { usePage, Link, Head } from '@inertiajs/vue3';
+import TenantLayout from '@/Layouts/TenantLayout.vue';
 
 const props = defineProps({
   institution: Object,
@@ -23,76 +24,11 @@ const formatCurrency = (minorUnits) => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-100" dir="ltr">
-    <!-- Impersonation Banner -->
-    <div v-if="$page.props.impersonation?.active" class="bg-amber-400 text-slate-900 px-4 py-2.5 font-bold text-xs sm:text-sm shadow-md flex flex-wrap items-center justify-between gap-2 border-b border-amber-500">
-      <div class="flex items-center gap-2">
-        <span class="px-2 py-0.5 bg-slate-900 text-white rounded text-[11px] uppercase tracking-wider font-extrabold">Support Session</span>
-        <span>You are viewing <strong>{{ $page.props.impersonation.institution_name }}</strong>. Reason: <em>"{{ $page.props.impersonation.reason }}"</em>. (Auto-expires in ~{{ $page.props.impersonation.minutes_remaining }} min)</span>
-      </div>
-      <Link href="/platform/impersonate/stop" method="post" as="button" class="px-3 py-1 bg-slate-900 text-white rounded-md text-xs hover:bg-slate-800 font-bold transition">
-        Leave Support Impersonation &rarr;
-      </Link>
-    </div>
+  <Head title="Dashboard - Beyan" />
 
-    <!-- Platform Announcement Banner -->
-    <div v-if="$page.props.announcement" class="bg-indigo-700 text-white px-4 py-2 text-xs sm:text-sm shadow-sm flex items-center justify-between gap-4 border-b border-indigo-800">
-      <div class="flex items-center gap-2 truncate">
-        <span class="font-extrabold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded text-[10px]">Announcement</span>
-        <span class="truncate"><strong>{{ $page.props.announcement.title }}:</strong> {{ $page.props.announcement.body }}</span>
-      </div>
-      <Link :href="`/announcements/${$page.props.announcement.id}/dismiss`" method="post" as="button" class="text-white/80 hover:text-white font-black text-sm ms-2 flex-shrink-0" title="Dismiss announcement">
-        ✕
-      </Link>
-    </div>
-
-    <!-- Top Navigation Header -->
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-40">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-          <div class="flex items-center gap-3">
-            <span class="p-2 bg-emerald-600 rounded-lg text-white font-bold text-lg">BM</span>
-            <div>
-              <span class="text-base sm:text-lg font-bold text-slate-800">{{ institution?.name || 'Madrasa Workspace' }}</span>
-              <span class="ms-2 px-2 py-0.5 text-[10px] font-semibold rounded-full bg-emerald-100 text-emerald-800 uppercase">
-                {{ institution?.mode || 'hybrid' }}
-              </span>
-            </div>
-          </div>
-
-          <!-- Main Nav Links -->
-          <div class="hidden md:flex items-center space-x-4 text-xs font-bold text-slate-600">
-            <Link :href="route('students.index')" class="hover:text-emerald-700 transition">Students</Link>
-            <Link v-if="!is_teacher_only" :href="route('courses.index')" class="hover:text-emerald-700 transition">Courses</Link>
-            <Link v-if="!is_teacher_only" :href="route('classes.index')" class="hover:text-emerald-700 transition">Classes</Link>
-            <Link :href="route('timetable.today')" class="hover:text-emerald-700 transition">Timetable</Link>
-            <Link :href="route('attendance.index')" class="hover:text-emerald-700 transition">Attendance</Link>
-            <Link :href="route('hifz.index')" class="hover:text-emerald-700 transition">Qur'an & Hifz</Link>
-            <Link v-if="!is_teacher_only" :href="route('staff.index')" class="hover:text-emerald-700 transition">Staff & Roles</Link>
-            <Link v-if="!is_teacher_only" :href="route('finance.invoices.index')" class="hover:text-emerald-700 transition">Finance</Link>
-            <Link v-if="!is_teacher_only" :href="route('reports.index')" class="hover:text-emerald-700 transition">Reports</Link>
-          </div>
-
-          <div class="flex items-center gap-3">
-            <div class="text-end hidden sm:block">
-              <div class="text-xs font-bold text-slate-900">{{ user?.name }}</div>
-              <div class="text-[10px] text-slate-500 uppercase">{{ user?.role }}</div>
-            </div>
-            <Link
-              href="/logout"
-              method="post"
-              as="button"
-              class="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md transition"
-            >
-              Logout
-            </Link>
-          </div>
-        </div>
-      </div>
-    </nav>
-
+  <TenantLayout :institution="institution" :is-teacher-only="is_teacher_only">
     <!-- Main Workspace Content -->
-    <main class="max-w-7xl mx-auto py-6 px-3 sm:px-6 lg:px-8 space-y-6">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
       <!-- Flash Notification -->
       <div v-if="page.props.flash?.success" class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium">
         ✓ {{ page.props.flash.success }}
@@ -324,6 +260,6 @@ const formatCurrency = (minorUnits) => {
           </div>
         </div>
       </div>
-    </main>
-  </div>
+    </div>
+  </TenantLayout>
 </template>
