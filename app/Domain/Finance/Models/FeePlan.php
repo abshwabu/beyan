@@ -5,6 +5,7 @@ namespace App\Domain\Finance\Models;
 use App\Domain\Academics\Models\Course;
 use App\Domain\Institution\Audit\Auditable;
 use App\Domain\Institution\Tenancy\BelongsToInstitution;
+use App\Domain\Students\Models\Student;
 use Database\Factories\FeePlanFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -56,6 +57,11 @@ class FeePlan extends Model
     public function discounts(): HasMany
     {
         return $this->hasMany(StudentDiscount::class, 'fee_plan_id');
+    }
+
+    public function students(): HasMany
+    {
+        return $this->hasMany(Student::class, 'fee_plan_id');
     }
 
     /**

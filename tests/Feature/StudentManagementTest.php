@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Domain\Auth\Models\User;
+use App\Domain\Finance\Models\FeePlan;
 use App\Domain\Institution\Models\Institution;
 use App\Domain\Institution\Tenancy\TenantManager;
 use App\Domain\Students\Models\Student;
@@ -256,5 +257,52 @@ class StudentManagementTest extends TestCase
 
         $this->assertDatabaseMissing('student_documents', ['id' => $document->id]);
         Storage::disk('local')->assertMissing($document->file_path);
+    }
+
+    public function test_can_link_student_to_fee_plan_on_creation_and_after_creation(): void
+    {
+        $this->actingAs($this->admin);
+
+        $planA = FeePlan::create([
+            'institution_id' => $this->institution->id,
+            'name' => 'Standard Monthly',
+            'code' => 'STD-M',
+            'period_type' => 'monthly',
+            'amount' => 150000,
+            'currency' => 'ETB',
+            'is_active' => true,
+        ]);
+
+        $planB = FeePlan::create([
+            'institution_id' => $this->institution->id,
+            'name' => 'Full Hifz Boarding',
+            'code' => 'HIFZ-B',
+            'period_type' => 'monthly',
+            'amount' => 250000,
+            'currency' => 'ETB',
+            'is_active' => true,
+        ]);
+
+        // 1. Link during student creation
+        $createResponse = $this->post(route('students.store'), [
+            'full_name' => 'Hamza Tariq',
+            'gender' => 'male',
+            'fee_plan_id' => $planA->id,
+        ]);
+
+        $student = Student::where('full_name', 'Hamza Tariq')->first();
+        $this->assertNotNull($student);
+        $this->assertEquals($planA->id, $student->fee_plan_id);
+        $createResponse->assertRedirect(route('students.show', $student->id));
+
+        // 2. Change linked plan after creation
+        $updateResponse = $this->put(route('students.update', $student->id), [
+            'fee_plan_id' => $planB->id,
+        ]);
+
+        $updateResponse->assertRedirect(route('students.show', $student->id));
+        $student->refresh();
+        $this->assertEquals($planB->id, $student->fee_plan_id);
+        $this->assertEquals('Full Hifz Boarding', $student->feePlan->name);
     }
 }

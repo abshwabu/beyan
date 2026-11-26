@@ -69,6 +69,7 @@ class RegisterStudentAction
 
             $student = Student::withoutInstitutionScope()->create([
                 'institution_id' => $institution->id,
+                'fee_plan_id' => $data['fee_plan_id'] ?? null,
                 'full_name' => $fullName,
                 'name' => $fullName,
                 'student_code' => $studentCode,

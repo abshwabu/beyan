@@ -2,6 +2,7 @@
 
 namespace App\Domain\Students\Http\Controllers;
 
+use App\Domain\Finance\Models\FeePlan;
 use App\Domain\Platform\Services\PlanLimitService;
 use App\Domain\Students\Actions\RegisterStudentAction;
 use App\Domain\Students\Models\Student;
@@ -13,6 +14,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -47,11 +49,13 @@ class StudentController extends Controller
     /**
      * Show mobile-first student registration form.
      */
-    public function create(): Response
+    public function create(Request $request): Response
     {
         Gate::authorize('create', Student::class);
 
-        return Inertia::render('Students/Create');
+        return Inertia::render('Students/Create', [
+            'feePlans' => $this->activeFeePlans($request->user()->institution_id),
+        ]);
     }
 
     /**
@@ -77,6 +81,11 @@ class StudentController extends Controller
             'contact.email' => ['nullable', 'email'],
             'contact.address' => ['nullable', 'string'],
             'initial_class' => ['nullable', 'string'],
+            'fee_plan_id' => [
+                'nullable',
+                'string',
+                Rule::exists('fee_plans', 'id')->where('institution_id', $request->user()->institution_id),
+            ],
             'guardians' => ['nullable', 'array'],
             'guardians.*.full_name' => ['required_with:guardians', 'string'],
             'guardians.*.phone' => ['nullable', 'string'],
@@ -108,6 +117,7 @@ class StudentController extends Controller
             'statusHistories.changedBy',
             'documents.uploadedBy',
             'teachers',
+            'feePlan',
         ])->findOrFail($id);
 
         Gate::authorize('view', $student);
@@ -118,6 +128,7 @@ class StudentController extends Controller
 
         return Inertia::render('Students/Show', [
             'student' => $student,
+            'feePlans' => $this->activeFeePlans($student->institution_id),
         ]);
     }
 
@@ -126,12 +137,13 @@ class StudentController extends Controller
      */
     public function edit(string $id): Response
     {
-        $student = Student::with(['guardians'])->findOrFail($id);
+        $student = Student::with(['guardians', 'feePlan'])->findOrFail($id);
 
         Gate::authorize('update', $student);
 
         return Inertia::render('Students/Edit', [
             'student' => $student,
+            'feePlans' => $this->activeFeePlans($student->institution_id),
         ]);
     }
 
@@ -151,6 +163,12 @@ class StudentController extends Controller
             'date_of_birth' => ['sometimes', 'nullable', 'date'],
             'admission_date' => ['sometimes', 'nullable', 'date'],
             'contact' => ['sometimes', 'nullable', 'array'],
+            'fee_plan_id' => [
+                'sometimes',
+                'nullable',
+                'string',
+                Rule::exists('fee_plans', 'id')->where('institution_id', $student->institution_id),
+            ],
         ]);
 
         $student->update($validated);
@@ -328,5 +346,22 @@ class StudentController extends Controller
         }
 
         return back()->with('success', 'Document removed successfully.');
+    }
+
+    /**
+     * Active fee plans for the given institution.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, FeePlan>
+     */
+    protected function activeFeePlans(?string $institutionId)
+    {
+        if (! $institutionId) {
+            return collect();
+        }
+
+        return FeePlan::where('institution_id', $institutionId)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'code', 'period_type', 'amount', 'currency']);
     }
 }

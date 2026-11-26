@@ -6,6 +6,7 @@ use App\Domain\Academics\Models\ClassGroup;
 use App\Domain\Attendance\Models\AttendanceRecord;
 use App\Domain\Auth\Models\User;
 use App\Domain\Finance\Models\FeeInvoice;
+use App\Domain\Finance\Models\FeePlan;
 use App\Domain\Finance\Models\StudentDiscount;
 use App\Domain\Hifz\Models\HifzCertification;
 use App\Domain\Hifz\Models\HifzEntry;
@@ -33,6 +34,7 @@ class Student extends Model
 
     protected $fillable = [
         'institution_id',
+        'fee_plan_id',
         'user_id',
         'guardian_id',
         'full_name',
@@ -177,6 +179,11 @@ class Student extends Model
     public function hifzCertifications(): HasMany
     {
         return $this->hasMany(HifzCertification::class, 'student_id');
+    }
+
+    public function feePlan(): BelongsTo
+    {
+        return $this->belongsTo(FeePlan::class, 'fee_plan_id');
     }
 
     public function feeInvoices(): HasMany

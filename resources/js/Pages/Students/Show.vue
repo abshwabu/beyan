@@ -7,11 +7,33 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  feePlans: {
+    type: Array,
+    default: () => [],
+  },
 });
 
 const showStatusModal = ref(false);
 const showTransferModal = ref(false);
 const showUploadModal = ref(false);
+const showFeePlanModal = ref(false);
+
+const feePlanForm = useForm({
+  fee_plan_id: props.student.fee_plan_id || '',
+});
+
+const submitFeePlan = () => {
+  feePlanForm
+    .transform((data) => ({
+      fee_plan_id: data.fee_plan_id || null,
+    }))
+    .put(route('students.update', props.student.id), {
+      preserveScroll: true,
+      onSuccess: () => {
+        showFeePlanModal.value = false;
+      },
+    });
+};
 
 const statusForm = useForm({
   status: props.student.status,
@@ -168,6 +190,25 @@ const getStatusBadgeClass = (s) => {
               <div class="pt-2 flex justify-between">
                 <dt class="text-slate-500 font-medium">Current Class</dt>
                 <dd class="font-bold text-emerald-700">{{ student.current_enrollment?.class_name || 'Unassigned' }}</dd>
+              </div>
+              <div class="pt-2 flex justify-between items-center gap-2">
+                <dt class="text-slate-500 font-medium">Tuition Fee Plan</dt>
+                <dd class="text-right">
+                  <span v-if="student.fee_plan" class="font-bold text-slate-900 block">
+                    {{ student.fee_plan.name }}
+                    <span class="text-[11px] font-normal text-slate-500">
+                      ({{ ((student.fee_plan.amount || 0) / 100).toLocaleString('en-US', { minimumFractionDigits: 2 }) }} {{ student.fee_plan.currency || 'ETB' }})
+                    </span>
+                  </span>
+                  <span v-else class="text-slate-400 italic">Not assigned</span>
+                  <button
+                    type="button"
+                    @click="showFeePlanModal = true"
+                    class="text-[11px] font-bold text-emerald-700 hover:underline mt-0.5"
+                  >
+                    {{ student.fee_plan ? 'Change Plan' : '+ Assign Plan' }}
+                  </button>
+                </dd>
               </div>
             </dl>
           </div>
@@ -390,6 +431,34 @@ const getStatusBadgeClass = (s) => {
           <div class="flex justify-end space-x-2 pt-2">
             <button type="button" @click="showUploadModal = false" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors">Cancel</button>
             <button type="submit" :disabled="uploadForm.processing" class="px-4 py-2 text-xs font-bold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 active:scale-[0.98] transition-all shadow-sm">Upload</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Assign / Change Fee Plan Modal -->
+    <div v-if="showFeePlanModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-base font-bold text-slate-900">Assign Tuition Fee Plan</h3>
+          <Link :href="route('finance.fee-plans.index')" class="text-[11px] font-bold text-emerald-700 hover:underline">
+            Manage Fee Plans
+          </Link>
+        </div>
+        <form @submit.prevent="submitFeePlan" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700">Select Fee Plan</label>
+            <select v-model="feePlanForm.fee_plan_id" class="mt-1 block w-full rounded-xl border-slate-300 text-sm focus:border-emerald-500 focus:ring-emerald-500">
+              <option value="">No Fee Plan Assigned</option>
+              <option v-for="plan in feePlans" :key="plan.id" :value="plan.id">
+                {{ plan.name }} — {{ ((plan.amount || 0) / 100).toLocaleString('en-US', { minimumFractionDigits: 2 }) }} {{ plan.currency || 'ETB' }} ({{ plan.period_type }})
+              </option>
+            </select>
+            <p v-if="feePlanForm.errors.fee_plan_id" class="text-xs text-rose-600 mt-1">{{ feePlanForm.errors.fee_plan_id }}</p>
+          </div>
+          <div class="flex justify-end space-x-2 pt-2">
+            <button type="button" @click="showFeePlanModal = false" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors">Cancel</button>
+            <button type="submit" :disabled="feePlanForm.processing" class="px-4 py-2 text-xs font-bold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 active:scale-[0.98] transition-all shadow-sm">Save Fee Plan</button>
           </div>
         </form>
       </div>

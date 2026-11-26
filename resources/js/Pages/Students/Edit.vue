@@ -7,6 +7,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  feePlans: {
+    type: Array,
+    default: () => [],
+  },
 });
 
 const page = usePage();
@@ -17,6 +21,7 @@ const form = useForm({
   gender: props.student.gender || 'male',
   date_of_birth: props.student.date_of_birth || '',
   admission_date: props.student.admission_date || '',
+  fee_plan_id: props.student.fee_plan_id || '',
   contact: {
     phone: props.student.contact?.phone || '',
     email: props.student.contact?.email || '',
@@ -193,6 +198,28 @@ const submit = () => {
                 />
               </div>
               <span v-if="form.errors.admission_date" class="text-xs text-rose-600 mt-1 block">{{ form.errors.admission_date }}</span>
+            </div>
+
+            <!-- Tuition Fee Plan -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                  Tuition Fee Plan
+                </label>
+                <Link :href="route('finance.fee-plans.index')" class="text-[11px] font-bold text-emerald-700 hover:underline">
+                  Manage Fee Plans
+                </Link>
+              </div>
+              <select
+                v-model="form.fee_plan_id"
+                class="block w-full rounded-lg border border-slate-300 text-sm px-3 py-2.5 bg-white transition-all outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+              >
+                <option value="">No Fee Plan Assigned</option>
+                <option v-for="plan in feePlans" :key="plan.id" :value="plan.id">
+                  {{ plan.name }} — {{ ((plan.amount || 0) / 100).toLocaleString('en-US', { minimumFractionDigits: 2 }) }} {{ plan.currency || 'ETB' }} ({{ plan.period_type }})
+                </option>
+              </select>
+              <span v-if="form.errors.fee_plan_id" class="text-xs text-rose-600 mt-1 block">{{ form.errors.fee_plan_id }}</span>
             </div>
           </div>
         </div>
