@@ -3,6 +3,7 @@
 namespace App\Domain\Students\Actions;
 
 use App\Domain\Auth\Models\User;
+use App\Domain\Finance\Actions\GenerateInvoiceAction;
 use App\Domain\Institution\Models\Institution;
 use App\Domain\Institution\Tenancy\TenantManager;
 use App\Domain\Students\Models\Guardian;
@@ -157,7 +158,11 @@ class RegisterStudentAction
                 }
             }
 
-            return $student->load(['guardians', 'currentEnrollment', 'enrollments']);
+            if (! empty($student->fee_plan_id)) {
+                app(GenerateInvoiceAction::class)->ensureForStudent($student);
+            }
+
+            return $student->load(['guardians', 'currentEnrollment', 'enrollments', 'feePlan']);
         });
     }
 }

@@ -61,8 +61,41 @@ class FinanceController extends Controller
 
         $invoices = $query->paginate(20)->withQueryString();
 
+        $currentPeriod = now()->format('Y-m');
+
+        $linkedStudents = Student::query()
+            ->whereNotNull('fee_plan_id')
+            ->with(['feePlan', 'feeInvoices' => fn ($q) => $q->where('period', $currentPeriod)])
+            ->orderBy('full_name')
+            ->get()
+            ->map(function (Student $student) {
+                $currentInvoice = $student->feeInvoices->firstWhere('fee_plan_id', $student->fee_plan_id);
+
+                return [
+                    'id' => $student->id,
+                    'full_name' => $student->full_name ?: $student->name,
+                    'student_code' => $student->student_code ?: $student->admission_number,
+                    'status' => $student->status,
+                    'fee_plan' => $student->feePlan ? [
+                        'id' => $student->feePlan->id,
+                        'name' => $student->feePlan->name,
+                        'period_type' => $student->feePlan->period_type,
+                        'amount' => $student->feePlan->amount,
+                        'currency' => $student->feePlan->currency,
+                    ] : null,
+                    'current_invoice' => $currentInvoice ? [
+                        'id' => $currentInvoice->id,
+                        'invoice_number' => $currentInvoice->invoice_number,
+                        'status' => $currentInvoice->status,
+                        'balance_due' => $currentInvoice->balance_due,
+                    ] : null,
+                ];
+            });
+
         return Inertia::render('Finance/Invoices/Index', [
             'invoices' => $invoices,
+            'linkedStudents' => $linkedStudents,
+            'currentPeriod' => $currentPeriod,
             'filters' => $request->only(['status', 'student_id', 'period']),
         ]);
     }

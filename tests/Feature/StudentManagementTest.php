@@ -304,5 +304,25 @@ class StudentManagementTest extends TestCase
         $student->refresh();
         $this->assertEquals($planB->id, $student->fee_plan_id);
         $this->assertEquals('Full Hifz Boarding', $student->feePlan->name);
+
+        // 3. Auto-generated invoices exist for both linked plans & student appears on invoices page
+        $this->assertDatabaseHas('fee_invoices', [
+            'student_id' => $student->id,
+            'fee_plan_id' => $planA->id,
+            'period' => now()->format('Y-m'),
+        ]);
+        $this->assertDatabaseHas('fee_invoices', [
+            'student_id' => $student->id,
+            'fee_plan_id' => $planB->id,
+            'period' => now()->format('Y-m'),
+        ]);
+
+        $invoicesPage = $this->get(route('finance.invoices.index'));
+        $invoicesPage->assertOk();
+        $invoicesPage->assertInertia(fn ($page) => $page
+            ->component('Finance/Invoices/Index')
+            ->has('linkedStudents', 1)
+            ->where('linkedStudents.0.id', $student->id)
+        );
     }
 }

@@ -125,4 +125,32 @@ class GenerateInvoiceAction
             return $invoice->load(['items', 'student', 'feePlan']);
         });
     }
+
+    /**
+     * Ensure an invoice exists for the student's linked fee plan for the given (or current) period.
+     */
+    public function ensureForStudent(Student $student, ?string $period = null): ?FeeInvoice
+    {
+        if (empty($student->fee_plan_id)) {
+            return null;
+        }
+
+        $targetPeriod = $period ?: now()->format('Y-m');
+
+        $existing = FeeInvoice::withoutInstitutionScope()
+            ->where('student_id', $student->id)
+            ->where('fee_plan_id', $student->fee_plan_id)
+            ->where('period', $targetPeriod)
+            ->first();
+
+        if ($existing) {
+            return $existing;
+        }
+
+        return $this->execute([
+            'student_id' => $student->id,
+            'fee_plan_id' => $student->fee_plan_id,
+            'period' => $targetPeriod,
+        ]);
+    }
 }

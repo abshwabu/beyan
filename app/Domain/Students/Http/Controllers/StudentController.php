@@ -2,6 +2,7 @@
 
 namespace App\Domain\Students\Http\Controllers;
 
+use App\Domain\Finance\Actions\GenerateInvoiceAction;
 use App\Domain\Finance\Models\FeePlan;
 use App\Domain\Platform\Services\PlanLimitService;
 use App\Domain\Students\Actions\RegisterStudentAction;
@@ -171,7 +172,12 @@ class StudentController extends Controller
             ],
         ]);
 
+        $previousFeePlanId = $student->fee_plan_id;
         $student->update($validated);
+
+        if (! empty($student->fee_plan_id) && $student->fee_plan_id !== $previousFeePlanId) {
+            app(GenerateInvoiceAction::class)->ensureForStudent($student);
+        }
 
         if ($request->wantsJson()) {
             return response()->json($student);
