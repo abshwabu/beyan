@@ -17,3 +17,8 @@ Schedule::command('platform:subscriptions:check-expiry')
     ->daily()
     ->at('03:00')
     ->withoutOverlapping();
+
+Schedule::command('finance:generate-invoices')
+    ->daily()
+    ->at('01:00')
+    ->withoutOverlapping();

@@ -324,5 +324,28 @@ class StudentManagementTest extends TestCase
             ->has('linkedStudents', 1)
             ->where('linkedStudents.0.id', $student->id)
         );
+
+        // 4. Subscription-like default generation: if a student has a fee_plan_id with no current-period invoice,
+        // visiting the invoices page auto-generates it by default.
+        $existingStudent = Student::create([
+            'institution_id' => $this->institution->id,
+            'fee_plan_id' => $planA->id,
+            'full_name' => 'Bilal Existing',
+            'gender' => 'male',
+            'status' => 'active',
+        ]);
+
+        $this->assertDatabaseMissing('fee_invoices', [
+            'student_id' => $existingStudent->id,
+        ]);
+
+        $this->get(route('finance.invoices.index'))->assertOk();
+
+        $this->assertDatabaseHas('fee_invoices', [
+            'student_id' => $existingStudent->id,
+            'fee_plan_id' => $planA->id,
+            'period' => now()->format('Y-m'),
+            'status' => 'unpaid',
+        ]);
     }
 }

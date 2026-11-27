@@ -39,6 +39,10 @@ class FinanceController extends Controller
     {
         Gate::authorize('viewAny', FeeInvoice::class);
 
+        if ($institutionId = $request->user()?->institution_id) {
+            $this->generateInvoiceAction->ensureForInstitution($institutionId);
+        }
+
         $query = FeeInvoice::query()
             ->with(['student', 'feePlan'])
             ->orderByDesc('created_at');
@@ -65,11 +69,17 @@ class FinanceController extends Controller
 
         $linkedStudents = Student::query()
             ->whereNotNull('fee_plan_id')
-            ->with(['feePlan', 'feeInvoices' => fn ($q) => $q->where('period', $currentPeriod)])
+            ->with(['feePlan', 'feeInvoices'])
             ->orderBy('full_name')
             ->get()
             ->map(function (Student $student) {
-                $currentInvoice = $student->feeInvoices->firstWhere('fee_plan_id', $student->fee_plan_id);
+                $targetPeriod = $student->feePlan
+                    ? $this->generateInvoiceAction->defaultPeriodForPlan($student->feePlan)
+                    : now()->format('Y-m');
+
+                $currentInvoice = $student->feeInvoices
+                    ->where('fee_plan_id', $student->fee_plan_id)
+                    ->firstWhere('period', $targetPeriod);
 
                 return [
                     'id' => $student->id,
